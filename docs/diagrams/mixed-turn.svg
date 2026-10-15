@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#374151"/></marker>
+    <marker id="ab" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#2563eb"/></marker>
+    <marker id="ag" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#15803d"/></marker>
+    <marker id="ar" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#b91c1c"/></marker>
+  </defs>
+
+  <style>
+    .lane  { fill: #f9fafb; stroke: #e5e7eb; stroke-width: 1.5; rx: 14; }
+    .lt    { fill: #111827; font-size: 17px; font-weight: 700; }
+    .gt    { fill: #6b7280; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+    .node  { fill: #ffffff; stroke: #374151; stroke-width: 2; rx: 10; }
+    .plug  { fill: #ffffff; stroke: #6366f1; stroke-width: 2; stroke-dasharray: 6 4; rx: 10; }
+    .blue  { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; rx: 10; }
+    .green { fill: #dcfce7; stroke: #15803d; stroke-width: 2; rx: 10; }
+    .red   { fill: #fee2e2; stroke: #b91c1c; stroke-width: 2; rx: 10; }
+    .grey  { fill: #f3f4f6; stroke: #6b7280; stroke-width: 2; rx: 10; }
+    .store { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+    .t     { fill: #111827; font-size: 16px; text-anchor: middle; }
+    .sub   { fill: #4b5563; font-size: 12.5px; text-anchor: middle; }
+    .e     { fill: none; stroke: #374151; stroke-width: 2; marker-end: url(#a); }
+    .eg    { fill: none; stroke: #15803d; stroke-width: 2; marker-end: url(#ag); }
+    .er    { fill: none; stroke: #b91c1c; stroke-width: 2; marker-end: url(#ar); }
+    .ed    { fill: none; stroke: #2563eb; stroke-width: 2; stroke-dasharray: 7 5; marker-end: url(#ab); }
+    .l     { fill: #374151; font-size: 13px; text-anchor: middle; }
+    .lg    { fill: #15803d; font-size: 13px; text-anchor: middle; }
+    .lr    { fill: #b91c1c; font-size: 13px; text-anchor: middle; }
+    .lb    { fill: #f9fafb; }
+    .legend{ fill: #6b7280; font-size: 12.5px; }
+    .life  { stroke: #9ca3af; stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .act   { fill: #e5e7eb; stroke: #9ca3af; stroke-width: 1; }
+    .msg   { fill: none; stroke: #374151; stroke-width: 1.8; marker-end: url(#a); }
+    .msgr  { fill: none; stroke: #374151; stroke-width: 1.8; stroke-dasharray: 5 4; marker-end: url(#a); }
+    .msgb  { fill: none; stroke: #2563eb; stroke-width: 1.8; marker-end: url(#ab); }
+    .ml    { fill: #111827; font-size: 12.5px; text-anchor: middle; }
+    .mlb   { fill: #ffffff; }
+  </style>
+
+<rect class="node" x="10" y="40" width="180" height="44"/><text class="t" x="100.0" y="68.0">LLM</text>
+<line class="life" x1="100" y1="84" x2="100" y2="920"/><rect class="blue" x="240" y="40" width="180" height="44"/><text class="t" x="330.0" y="68.0">TTSCacheRead</text>
+<line class="life" x1="330" y1="84" x2="330" y2="920"/><rect class="blue" x="460" y="40" width="180" height="44"/><text class="t" x="550.0" y="68.0">TTSCache core</text>
+<line class="life" x1="550" y1="84" x2="550" y2="920"/><rect class="node" x="680" y="40" width="180" height="44"/><text class="t" x="770.0" y="68.0">TTSService (stock)</text>
+<line class="life" x1="770" y1="84" x2="770" y2="920"/><rect class="blue" x="900" y="40" width="180" height="44"/><text class="t" x="990.0" y="68.0">TTSCacheWrite</text>
+<line class="life" x1="990" y1="84" x2="990" y2="920"/><rect class="node" x="1100" y="40" width="180" height="44"/><text class="t" x="1190.0" y="68.0">transport</text>
+<line class="life" x1="1190" y1="84" x2="1190" y2="920"/><path class="msg" d="M100,120 L324,120"/>
+<rect class="mlb" x="2.5" y="100" width="425" height="16"/><text class="ml" x="215.0" y="112">tokens: "Hi, who's there? Let me check your order. Thanks."</text>
+<text class="gt" x="44" y="152">SENTENCE 1</text>
+<path class="msg" d="M330,180 L544,180"/>
+<rect class="mlb" x="343.0" y="160" width="194" height="16"/><text class="ml" x="440.0" y="172">lookup("Hi, who's there?")</text>
+<path class="msgr" d="M550,220 L336,220"/>
+<rect class="mlb" x="392.0" y="200" width="96" height="16"/><text class="ml" x="440.0" y="212">hit, from L1</text>
+<path class="msgb" d="M330,260 L764,260"/>
+<rect class="mlb" x="337.5" y="240" width="425" height="16"/><text class="ml" x="550.0" y="252">TTSStarted, TTSAudioRaw chunks, TTSText, TTSStopped (ctx 1)</text>
+<path class="msg" d="M770,300 L984,300"/>
+<rect class="mlb" x="748.0" y="280" width="264" height="16"/><text class="ml" x="880.0" y="292">same frames, passed through in order</text>
+<path class="msg" d="M990,340 L1184,340"/>
+<rect class="mlb" x="1052.5" y="320" width="75" height="16"/><text class="ml" x="1090.0" y="332">forwarded</text>
+<text class="gt" x="44" y="372">SENTENCE 2</text>
+<path class="msg" d="M330,400 L544,400"/>
+<rect class="mlb" x="315.0" y="380" width="250" height="16"/><text class="ml" x="440.0" y="392">lookup("Let me check your order.")</text>
+<path class="msgr" d="M550,440 L336,440"/>
+<rect class="mlb" x="420.0" y="420" width="40" height="16"/><text class="ml" x="440.0" y="432">miss</text>
+<path class="msg" d="M330,480 L764,480"/>
+<rect class="mlb" x="449.5" y="460" width="201" height="16"/><text class="ml" x="550.0" y="472">AggregatedTextFrame (ctx 2)</text>
+<rect class="act" x="764" y="490" width="12" height="56"/><text class="ml" x="860" y="514">run_tts: provider call</text>
+<text class="gt" x="44" y="552">SENTENCE 3, LOOKED UP WHILE SENTENCE 2 SYNTHESISES</text>
+<path class="msg" d="M330,580 L544,580"/>
+<rect class="mlb" x="374.5" y="560" width="131" height="16"/><text class="ml" x="440.0" y="572">lookup("Thanks.")</text>
+<path class="msgr" d="M550,620 L336,620"/>
+<rect class="mlb" x="392.0" y="600" width="96" height="16"/><text class="ml" x="440.0" y="612">hit, from L1</text>
+<path class="msgb" d="M330,660 L764,660"/>
+<rect class="mlb" x="397.0" y="640" width="306" height="16"/><text class="ml" x="550.0" y="652">cached frames (ctx 3), queued behind ctx 2</text>
+<text class="gt" x="44" y="692">AUDIO LEAVES IN SENTENCE ORDER</text>
+<path class="msg" d="M770,720 L984,720"/>
+<rect class="mlb" x="713.0" y="700" width="334" height="16"/><text class="ml" x="880.0" y="712">TTSStarted, TTSAudioRaw..., TTSStopped (ctx 2)</text>
+<path class="msg" d="M990,760 L1184,760"/>
+<rect class="mlb" x="1017.5" y="740" width="145" height="16"/><text class="ml" x="1090.0" y="752">forwarded unchanged</text>
+<path class="msgb" d="M990,800 L556,800"/>
+<rect class="mlb" x="624.0" y="780" width="292" height="16"/><text class="ml" x="770.0" y="792">capture("Let me check your order.", pcm)</text>
+<path class="msg" d="M770,840 L984,840"/>
+<rect class="mlb" x="800.5" y="820" width="159" height="16"/><text class="ml" x="880.0" y="832">cached frames (ctx 3)</text>
+<path class="msg" d="M990,880 L1184,880"/>
+<rect class="mlb" x="1052.5" y="860" width="75" height="16"/><text class="ml" x="1090.0" y="872">forwarded</text>
+<text class="legend" x="44" y="956">Blue arrows are cache actions. The stock TTSService serialises everything it receives, so a hit queued after a miss waits for the miss audio and a hit before a miss plays at once.</text>
+</svg>
