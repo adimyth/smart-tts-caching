@@ -11,6 +11,43 @@ Built as of 2026-10-18. [TEST_PLAN.md](TEST_PLAN.md) is the evaluation method an
 - `tts-cache`, the framework-free core: scope and key, the per-script canonicaliser (en, hi, ta fixtures), the sentence splitter, Opus, FLAC and PCM codecs with streaming decode, `MemoryStore`, `SQLiteStore`, `RedisStore` and `TieredStore`, the policies, Level A, B and C matchers, metrics, the `TTSCache` facade with fail-open boundaries, and the `tts-cache` command (`ping`, `replay`, `bench`, `warm`).
 - `tts-cache-pipecat`: `TTSCacheRead` and `TTSCacheWrite`, the three per-sentence websocket subclasses, the capture-mode table and `scope_from_service` for the six supported classes, a Pipecat metrics sink, the REST provider for `warm`, and `tts-cache-pipecat bench`.
 
+### Test results, 2026-10-19
+
+Does each match level serve only what it should? The full answer, with every table, is in [TEST_REPORT.md](TEST_REPORT.md). The evaluation ran offline: the cache's own code over 12 languages × repetition rates 0, 0.25 and 0.5 × 10 seeds × 200 labelled sentences (2,040 runs), plus 480 reruns with the Level C judge, driven by a stand-in provider that cannot change whether a sentence hits. Every sentence carries a label saying which level may serve it, and the corpora include decoys a level must not serve: a changed number or name, a changed meaning, a statement turned into a question. No provider was called and nothing was spent.
+
+| Level | Verdict | Evidence |
+|---|---|---|
+| A, exact match (default) | Works | Served every repeat whose earlier copy was in an earlier turn, and never a wrong clip, in all 12 languages. |
+| B, punctuation and filler (default) | Works, one accepted risk | Adds 4.1 to 4.7 points of character hit rate at r = 0.25, never a wrong meaning. It does play a statement's clip for the same words as a question ("Your order is confirmed." for "Your order is confirmed?"), 61 to 68 times per language, a risk the plan accepted. |
+| C, paraphrase, encoder and vetoes only | Not safe | Adds 2.5 to 3.7 points, but served a different meaning in 11 of 12 languages, 97 times: "Shall I reschedule the delivery to next Monday?" for "Shall I cancel …", "we are fully booked" for "we have free slots". |
+| C with the judge (opt-in) | Safe on this data | 0 wrong-meaning serves in 480 runs across all 12 languages, at about half Level C's gain; almost no gain in Assamese, Marathi and Odia. |
+
+Character hit rate at r = 0.5 (half the sentences repeat something said earlier), Level C's increment at r = 0.25, and wrong-meaning serves over all runs:
+
+| Language | A | A+B, the default | Level C adds, no judge | Level C adds, with judge | Wrong-meaning serves, A+B / C / C with judge |
+|---|---|---|---|---|---|
+| English | 31.2 % | 40.2 % | +3.4 | +2.9 | 0 / 10 / 0 |
+| Hindi | 30.6 % | 39.2 % | +3.6 | +2.8 | 0 / 2 / 0 |
+| Bengali | 31.0 % | 39.7 % | +3.2 | +2.0 | 0 / 7 / 0 |
+| Assamese | 30.6 % | 38.9 % | +2.5 | +0.7 | 0 / 15 / 0 |
+| Punjabi | 30.1 % | 38.8 % | +2.5 | +1.6 | 0 / 8 / 0 |
+| Gujarati | 30.6 % | 39.5 % | +3.5 | +2.3 | 0 / 0 / 0 |
+| Marathi | 31.0 % | 39.0 % | +3.3 | +0.2 | 0 / 5 / 0 |
+| Odia | 29.9 % | 38.7 % | +2.7 | +0.1 | 0 / 5 / 0 |
+| Tamil | 31.3 % | 40.0 % | +3.2 | +1.3 | 0 / 14 / 0 |
+| Telugu | 31.1 % | 39.9 % | +3.1 | +2.3 | 0 / 13 / 0 |
+| Kannada | 30.8 % | 39.5 % | +3.4 | +2.1 | 0 / 8 / 0 |
+| Malayalam | 30.6 % | 39.0 % | +3.0 | +1.8 | 0 / 10 / 0 |
+
+- The hit rate follows how often the agent repeats itself, not the language; `tts-cache replay` over your own transcript log gives the number to trust.
+- The bookkeeping holds in every run: characters not billed equal characters served, the cache's own metrics equal the oracle's counts, and adding a level never serves less. Four misses in 2,040 runs lack an explanation from the plan's closed list.
+- The test found four negation defects in the matching code: Bengali negative copulas were not recognised; Kannada and Tamil negative suffixes were written with vowel letters that never occur inside a word; Tamil and Telugu negative imperatives and future negatives were missing; and Assamese and Odia negations were listed as filler words, which let Level B drop a "not". All four are fixed and tested.
+- A hit starts audio in 1.4 to 8.3 ms against 131 ms to 2.4 s from the provider (earlier live round trips, six provider classes, en, hi, ta). At r = 0.5, A+B serves about 39 percent of characters, which at list prices saves about $20 per million characters sent on ElevenLabs Flash, $9 on Sarvam bulbul:v4-flash and $6 on OpenAI gpt-4o-mini-tts.
+- Two wiring mistakes go unflagged: leaving out `TTSCacheWrite` gives zero hits with no warning, and a scope that names a different voice from the one the service speaks (built by hand rather than with `scope_from_service`) stores the clips under the other voice's key, so a later deployment that does use that voice plays the wrong voice. The voice is part of the key; the cache trusts the scope it is given.
+- Not done: the live stage of the plan (real providers, ASR of served clips), the size sweeps, and most usability tests.
+
+### Component measurements
+
 Measured on an Apple M4 Pro, local Redis 7.0.11:
 
 | What | Result |
@@ -27,8 +64,9 @@ Measured on an Apple M4 Pro, local Redis 7.0.11:
 | Level B, probe over 1,000 entries | 0.10 ms p50, 0.32 ms p99; no slot change served across 1,000 generated variations |
 | Level B on the synthetic corpus, r = 0.5, 40 percent of repeats near-duplicates | hit rate 33.1 percent without Level B, 39.4 serving punctuation, 45.1 serving punctuation and filler |
 | Level C, embed, probe and vetoes over 1,000 entries | 2.8 ms p50, 3.6 ms p99 with multilingual-e5-small; 0.12 ms p50 with the static model |
+| Level C judge (opt-in), one NLI check of the candidate | 17.5 ms p50 in English, 19 to 27 ms in ten Indic languages, 39 ms in Odia (twice the tokens); mDeBERTa-v3-base through onnxruntime on two threads |
 
-Level C routing map after the acceptance check of section 5 (200 pairs per language in `packages/tts-cache/tests/fixtures/semantic/`, half paraphrases, half one-slot near-misses), with `multilingual-e5-small` through onnxruntime and the slot and span vetoes. Zero near-misses accepted in every language; the vetoes stop 100 of 100.
+Level C routing map, the languages Level C may serve in once an application enables it, after the acceptance check of section 5 (200 pairs per language in `packages/tts-cache/tests/fixtures/semantic/`, half paraphrases, half one-slot near-misses), with `multilingual-e5-small` through onnxruntime and the slot and span vetoes. Zero near-misses accepted in every language; the vetoes stop 100 of 100.
 
 | Language | Paraphrases accepted at the 0.90 floor (80 % required) | Route |
 |---|---|---|
@@ -47,6 +85,15 @@ Level C routing map after the acceptance check of section 5 (200 pairs per langu
 | everything else | not checked | Levels A and B only |
 
 Why these pieces. Every sentence encoder scores a changed name, date or amount (mean cosine 0.88 to 0.97) as closer than a true paraphrase, so the decision cannot rest on similarity alone. The slot veto refuses a candidate whose numbers, amounts, dates, lexicon names or foreign-script words differ; the span veto refuses one that differs by a single substitution of one or two tokens, or up to four when a digit is involved, or by one insertion or deletion of one or two non-filler tokens, which is what a changed fact or a negation looks like and a paraphrase never does. A negation word anywhere also marks the sentence, so "सफल रहा" never matches "सफल नहीं रहा" however the rest is phrased. Together they stopped every slot near-miss and every negation decoy in all twelve languages. Their cost is recall: 2 to 11 paraphrases per 100 refused. With safety handled, the encoder question is recall alone: the static model `potion-multilingual-128M` accepts 57, 21 and 21 percent of paraphrases in English, Hindi and Tamil, because it scores a paraphrase that swaps native words for English loanwords at 0.2 to 0.5; `multilingual-e5-small` accepts 85 to 100 percent, at 2.3 ms per sentence through onnxruntime. Level C runs only after Levels A and B miss. On the 200-sentence synthetic corpus Level C served nothing it should not have: hit counts equal the exact-repeat counts.
+
+What the vetoes cannot see, and why Level C is opt-in. The test plan's corpora (TEST_REPORT.md) add an authored meaning change for every base sentence, and there Level C served a different meaning in 11 of 12 languages: "cancel" for "reschedule", "fully booked" for "free slots", "15 percent extra" for "15 percent off", an unrelated sentence that shared one number. Such a pair differs in more than one place and carries the same slots, so neither veto applies, and the encoder scores it above 0.90 because both sentences are about the same thing. The judge in `tts_cache.match.judge` reads the candidate and the request together instead: an NLI cross-encoder (mDeBERTa-v3-base fine-tuned on multilingual NLI, through onnxruntime) that serves only when each sentence entails the other with probability at least 0.70, a margin of 0.10 over the highest-scoring wrong serve. Rerun end to end on the same matrix (12 languages, r = 0.25 and 0.5, 10 seeds, `harness/out/testplan/judge`), it took Level C's wrong-meaning serves from 97 to 0 and halved its hits (per language in "Test results" above). In Assamese, Marathi and Odia the model rarely calls a true paraphrase entailed (27, 9 and 22 percent of them), so there the judge makes Level C safe but nearly useless. The judge needs the vetoes as well: on its own it accepts a transposed amount, ₹1,450 against ₹1,540. It costs a 1.1 GB model (the int8 export flips 7 percent of decisions), about 2.5 GB of resident memory per process, shared by every cache in it, and one check per Level C candidate; the cache adds 100 ms to its default lookup deadline when the matcher has a judge, and a check that runs past it sends the sentence to the provider, which happened to 97 of about 2,000 checks with six benchmark processes sharing the CPU, 54 of them in Odia. To turn it on:
+
+```python
+from tts_cache import LEVEL_C_POLICY, TTSCache
+from tts_cache.cache import default_matcher
+
+cache = TTSCache(scope, store, policy=LEVEL_C_POLICY, matcher=default_matcher(judge=True))
+```
 
 Run the tests and the harness:
 
@@ -103,7 +150,7 @@ The text half of the key is the canonical form: Unicode NFC with Indic nukta and
 
 - Level A, exact match on canonical text. A hash lookup, on by default, and where most hits come from.
 - Level B, near duplicate, on by default for punctuation and filler differences. Character n-gram shingles with MinHash find candidates; an edit-distance check and a diff classifier decide. A difference in a name, number, date or amount never serves, because a listener can hear a synthesised span spliced into stored audio. Character shingles work the same across Indian scripts.
-- Level C, semantic paraphrase, on by default in languages that pass the acceptance check (English and eleven Indic languages today). A multilingual sentence encoder (`multilingual-e5-small` through onnxruntime, about 2.5 ms per sentence on one CPU thread) proposes the nearest stored sentence; a slot veto refuses it unless both sentences carry exactly the same numbers, amounts, dates, names and foreign-script words, and a span veto refuses it if the two differ by a single short substitution. When this level serves, the stored text replaces the LLM text in the transcript, so the record matches what the user heard.
+- Level C, semantic paraphrase, opt-in (`LEVEL_C_POLICY` with `default_matcher(judge=True)`), in languages that pass the acceptance check (English and eleven Indic languages today). A multilingual sentence encoder (`multilingual-e5-small` through onnxruntime, about 2.5 ms per sentence on one CPU thread) proposes the nearest stored sentence; a slot veto refuses it unless both sentences carry exactly the same numbers, amounts, dates, names and foreign-script words, and a span veto refuses it if the two differ by a single short substitution. The judge, an NLI cross-encoder, then reads the candidate and the request together and refuses it unless each entails the other; without it this level served changed meanings in the test plan. When this level serves, the stored text replaces the LLM text in the transcript, so the record matches what the user heard.
 
 ### Where the audio lives
 
@@ -149,12 +196,12 @@ Every "should we" decision goes through one interface: whether to look up, wheth
 
 ## Extend support for your language
 
-Twelve languages ship with full support: English, Hindi, Bengali, Assamese, Punjabi, Gujarati, Marathi, Odia, Tamil, Telugu, Kannada and Malayalam, each with canonicaliser, splitter, Level B and Level C fixtures and word lists. Level A works for any language with no setup: the key is a hash of the canonical text, and canonicalisation is Unicode-general. Level B serves punctuation differences in any language with no setup; to also serve leading and trailing filler words it needs a filler list. Level C needs an encoder that covers the language and, to switch on by default, the acceptance check below. What each step takes:
+Twelve languages ship with full support: English, Hindi, Bengali, Assamese, Punjabi, Gujarati, Marathi, Odia, Tamil, Telugu, Kannada and Malayalam, each with canonicaliser, splitter, Level B and Level C fixtures and word lists. Level A works for any language with no setup: the key is a hash of the canonical text, and canonicalisation is Unicode-general. Level B serves punctuation differences in any language with no setup; to also serve leading and trailing filler words it needs a filler list. Level C needs an encoder that covers the language and, to be routed, the acceptance check below; with the judge, it also needs the judge to recognise the language's paraphrases (see "Status"). What each step takes:
 
 1. **Character set.** Add the script's code point range to `_SCRIPT_RANGES` in `tts_cache/match/slots.py` so a word in another script counts as a fact for the slot veto. Digits in any script are already folded to ASCII, and the span veto (one short substitution is a changed fact) needs nothing per language. This is the safety core, and it is language-independent.
 2. **Word lists, optional but recommended.** In `tts_cache/match/lexicon.py`: filler words and phrases (Level B's filler class), date and time words, currency words, and common names. In `slots.py`: titles that precede a name, honorifics that follow one, and frequent function words. Each list is 10 to 60 tokens. Abbreviations that end with a period but not a sentence go in `NO_SPLIT_AFTER` in `tts_cache/split.py`.
 3. **Encoder coverage.** The default encoder, `multilingual-e5-small`, covers about 100 languages. The routing map `ROUTES` in `tts_cache/match/semantic.py` maps a language code to a model name. Any sentence-transformer on the Hugging Face hub that ships `onnx/model.onnx` and `onnx/tokenizer.json` works by name, as does any model2vec static model (`minishlab/...`). You can swap the model per language, or pass your own `routes` to `SemanticMatcher` without changing the package.
-4. **Acceptance check, which is what turns Level C on.** Write `tests/fixtures/semantic/<lang>.yaml`: 200 pairs, 100 paraphrases that keep every fact, and 100 near-misses that change exactly one fact (25 each of name, number, date, amount) and nothing else. Run `acceptance(lang, pairs, load_model(name))`. The language passes when no near-miss is accepted and at least 80 percent of paraphrases are, and then its entry in `ROUTES` points at the model. Until then the language gets Levels A and B, and an application that accepts the risk can still route it on through `routes`.
+4. **Acceptance check, which is what routes Level C.** Write `tests/fixtures/semantic/<lang>.yaml`: 200 pairs, 100 paraphrases that keep every fact, and 100 near-misses that change exactly one fact (25 each of name, number, date, amount) and nothing else. Run `acceptance(lang, pairs, load_model(name))`. The language passes when no near-miss is accepted and at least 80 percent of paraphrases are, and then its entry in `ROUTES` points at the model. Until then the language gets Levels A and B, and an application that accepts the risk can still route it on through `routes`.
 
 Fixtures for the canonicaliser (`fixtures/canonical/<lang>.yaml`), the splitter (`fixtures/split/`) and Level B (`fixtures/near/`, `fixtures/filler/`) follow the same per-language files; the tests pick up every language that has a file.
 

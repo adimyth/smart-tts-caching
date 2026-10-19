@@ -13,7 +13,7 @@ Offline evaluation, 2026-10-19. The owner stopped the test plan before its live 
 | **B**, punctuation and filler | **Works** | Adds 4.1 to 4.7 points of character hit rate at r = 0.25, interval above zero in every language; no wrong-meaning serve after the F6 fix. Serves a question as its statement (`punct_question`), 61 to 68 times per language: the risk the owner accepted. |
 | **C**, semantic paraphrase | **Not safe to enable by default** | Adds 2.5 to 3.7 points and catches 75 % of paraphrases, but served a clip with the wrong meaning in 11 of 12 languages (Gujarati 0). By the plan's rule (13.1) one such serve makes a level unsafe. |
 
-**Recommendation:** ship Levels A and B on by default; make Level C opt-in until it has a stronger meaning check than the 0.90 floor plus the slot and span vetoes.
+**Recommendation:** ship Levels A and B on by default; make Level C opt-in until it has a stronger meaning check than the 0.90 floor plus the slot and span vetoes. Done the same day: Level C is opt-in, and with the judge of the addendum below it served no wrong meaning in any language, at about half its gain.
 
 ## Per language
 
@@ -62,6 +62,32 @@ Three kinds, none of which a word list can close:
 - **Antonyms and reversals with no negation word.** Asked "Shall I cancel the delivery for next Monday?", it played "Shall I reschedule the delivery to next Monday?"; asked "Good news, we have free slots for the whole of May.", it played "I am sorry, we are fully booked for the whole of May."; asked "The salon charges 15 percent extra on weekday bookings!", it played "… offers 15 percent off …". The encoder scores these at 0.90 or above and every fact (number, date, name) matches, so both vetoes let them through.
 - **Unrelated sentences just above the floor.** Asked "Your replacement debit card should reach you in 4 working days.", it played "Your follow-up with the cardiologist is due in 4 weeks." Same number, same shape, different meaning, cosine above 0.90.
 - **Facts the detectors cannot see.** A three-word shop name changed (Kannada "ಶ್ರೀ ಗಣೇಶ ಟ್ರೇಡರ್ಸ್" to another name) is longer than the span veto's two-token substitution and unknown to the name lexicon; a negation moved from one clause to another (Assamese) leaves both sentences negated.
+
+## Addendum: Level C with a judge
+
+Added after the test, same day, on the owner's decision; **measured** on this machine, nothing spent. A judge (`tts_cache.match.judge`) now runs after the vetoes: an NLI cross-encoder, mDeBERTa-v3-base fine-tuned on multilingual NLI, reads the candidate and the request together and serves only when each entails the other with probability at least 0.70.
+
+- **Choosing the model.** On the 1,228 distinct pairs Level C served above (93 with a changed meaning, 1,135 paraphrases; `packages/tts-cache/tests/fixtures/judge/`), four candidates were scored. At the lowest threshold that refuses all 93, mDeBERTa keeps 52 to 60 percent of the paraphrases; Qwen3.5-4B as a local LLM judge 37 to 53 percent, at far greater cost; XLM-R large and IndicBERTv2 XNLI let changed meanings through at every threshold. The threshold, 0.70, is the highest changed pair's score (0.60) plus 0.10; on 500 random half-splits that margin let 0.06 percent of held-out changed pairs through, against 2 percent with no margin.
+- **End to end.** The offline matrix rerun with and without the judge, 12 languages × r ∈ {0.25, 0.5} × 10 seeds on the current code (480 runs, `harness/out/testplan/judge/offline`): wrong-meaning serves (`new`, `slot_change`, `meaning_change`) went from 97 to **0** in every language, and Level C's hits from 2,097 to 1,019.
+
+| Language | Δ(C) at r = 0.25, without judge | with judge | Wrong-meaning serves, without / with |
+|---|---|---|---|
+| English | +3.4 | +2.9 | 10 / 0 |
+| Hindi | +3.6 | +2.8 | 2 / 0 |
+| Bengali | +3.2 | +2.0 | 7 / 0 |
+| Assamese | +2.5 | +0.7 | 15 / 0 |
+| Punjabi | +2.5 | +1.6 | 8 / 0 |
+| Gujarati | +3.5 | +2.3 | 0 / 0 |
+| Marathi | +3.3 | +0.2 | 5 / 0 |
+| Odia | +2.7 | +0.1 | 5 / 0 |
+| Tamil | +3.2 | +1.3 | 14 / 0 |
+| Telugu | +3.1 | +2.3 | 13 / 0 |
+| Kannada | +3.4 | +2.1 | 8 / 0 |
+| Malayalam | +3.0 | +1.8 | 10 / 0 |
+
+- **Where it falls short.** The model rarely calls a true paraphrase entailed in Marathi (9 percent kept), Odia (22) and Assamese (27), so there the judge makes Level C safe but adds almost nothing. Alone, it accepts a transposed amount (₹1,450 against ₹1,540); the slot veto refuses that, so the judge runs after the vetoes, never instead of them.
+- **Cost.** A 1.1 GB model (the int8 export flips 7 percent of decisions), about 2.5 GB of resident memory per process, 17.5 ms p50 per check in English, 19 to 27 ms in ten Indic languages and 39 ms in Odia, whose sentences take twice the tokens. A cache whose matcher has a judge adds 100 ms to its lookup deadline; with six processes sharing the CPU, 97 of about 2,000 checks ran past it (54 in Odia) and went to the provider.
+- **What changed in the code.** Level C is now opt-in: `DEFAULT_POLICY` is Levels A and B, and `LEVEL_C_POLICY` with `default_matcher(judge=True)` turns on Level C with the judge.
 
 ## Checks
 
@@ -119,6 +145,6 @@ Worked example, labelled as arithmetic, not a measurement: an agent doing 1 mill
 
 - **The live stage** (section 11), the preflight and ASR: not run, so no live confirmation of latency or billing on this corpus.
 - **The size sweeps** (section 9): only the store-capacity sweep finished, and it was not analysed.
-- **Usability** (section 10): only U8 ran. Wiring the cache wrongly is caught and named for text filters left on the service, reused context ids and a mismatched sample rate. Two cases are not caught: a missing `TTSCacheWrite` gives zero hits with nothing named, and a scope built for the wrong voice serves the old voice to the next deployment (80 of 80) with nothing named.
+- **Usability** (section 10): only U8 ran. Wiring the cache wrongly is caught and named for text filters left on the service, reused context ids and a mismatched sample rate. Two cases are not caught: a missing `TTSCacheWrite` gives zero hits with nothing named, and a scope that names a different voice from the one the service speaks stores its clips under that voice's key, so the next deployment, which really uses that voice, plays the old one (80 of 80) with nothing named. The voice is in the key; the cache trusts the scope it is given.
 - The harness for the live stage (`harness/live_bench.py`) passed a fake-provider check of one full cell with a provider error, an empty stream, a 429, a stall, a killed Redis and a harness crash; it is ready to run on the owner's word.
 
