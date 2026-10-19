@@ -16,6 +16,7 @@ ALLOWED: dict[str, frozenset[str]] = {
     "A+B": frozenset({"exact", "surface", "punct_inner", "punct_end", "filler"}),
     "A+B+C": frozenset({"exact", "surface", "punct_inner", "punct_end", "filler", "paraphrase"}),
 }
+ALLOWED["A+B+C+J"] = ALLOWED["A+B+C"]  # Level C with its judge: the same serves are allowed
 CRITICAL = frozenset({"new", "slot_change", "meaning_change"})
 # The level whose index must hold the earlier copy for the label to hit.
 LEVEL_FOR = {

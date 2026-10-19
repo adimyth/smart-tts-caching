@@ -243,7 +243,10 @@ CONFIGS = ("OFF", "A", "A+B", "A+B+C")
 
 
 def config_policy(levels: str) -> tuple[Any, Any]:
-    """The policy and matcher of each configuration of TEST_PLAN.md section 4."""
+    """The policy and matcher of each configuration of TEST_PLAN.md section 4.
+
+    ``A+B+C+J`` is Level C with its judge (:mod:`tts_cache.match.judge`).
+    """
     from tts_cache.cache import default_matcher
     from tts_cache.match import ExactMatcher, Matchers
     from tts_cache.match.near import NearDuplicateMatcher
@@ -255,6 +258,8 @@ def config_policy(levels: str) -> tuple[Any, Any]:
         return AllOf(BASE_POLICY, LevelB({"punctuation", "filler"})), Matchers(near=NearDuplicateMatcher())
     if levels == "A+B+C":
         return LEVEL_C_POLICY, default_matcher(level_c=True)
+    if levels == "A+B+C+J":
+        return LEVEL_C_POLICY, default_matcher(judge=True)
     raise ValueError(f"unknown configuration {levels!r}")
 
 
@@ -269,6 +274,10 @@ class _TimedMatcher:
 
     def handles(self, level: Any) -> bool:
         return self.inner.handles(level)
+
+    @property
+    def extra_deadline_ms(self) -> float:
+        return float(getattr(self.inner, "extra_deadline_ms", 0.0))
 
     async def find(self, *a: Any, **kw: Any) -> Any:
         return await self.inner.find(*a, **kw)
