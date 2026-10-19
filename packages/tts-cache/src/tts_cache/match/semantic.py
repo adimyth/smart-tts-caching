@@ -14,6 +14,11 @@ route for languages where speed matters more than recall. A Level C hit plays
 the stored clip, so ``Hit.spoken_text`` is the stored text and every host must
 write that text to its transcript and context.
 
+A matcher built with a ``judge`` (:mod:`tts_cache.match.judge`, opt-in) asks
+it about the candidate the vetoes let through and serves only when the judge
+finds that each sentence entails the other; the check runs in a worker
+thread, off the event loop.
+
 A language serves Level C only after it passes the acceptance check of
 section 5 (:func:`acceptance`): 200 pairs, half paraphrases and half
 near-misses with one changed slot; at the chosen threshold no near-miss may be
@@ -21,12 +26,14 @@ accepted and at least 80 percent of paraphrases must be. ``ROUTES`` records
 the outcome: a language that failed, or has not been checked, maps to None.
 """
 
+import asyncio
 import threading
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
 
 from tts_cache.match import Match
+from tts_cache.match.judge import JUDGE_DEADLINE_MS, JUDGE_THRESHOLD, Judge
 from tts_cache.match.lexicon import lang_of
 from tts_cache.match.slots import slots, span_veto
 from tts_cache.policy import Level
@@ -160,7 +167,9 @@ class SemanticMatcher:
     ``routes`` maps a language to a model name or None (Level C off for it);
     ``encoder`` replaces the model for every language, for tests. Thresholds
     are cosine similarities; an entry's own threshold, when the store has
-    learned one, overrides ``threshold``.
+    learned one, overrides ``threshold``. ``judge`` scores the candidate that
+    clears the threshold and the vetoes, and it is served only when the score
+    reaches ``judge_threshold``; ``judged`` counts the candidates it refused.
     """
 
     def __init__(
@@ -169,13 +178,23 @@ class SemanticMatcher:
         *,
         threshold: float = DEFAULT_THRESHOLD,
         encoder: Encoder | None = None,
+        judge: Judge | None = None,
+        judge_threshold: float = JUDGE_THRESHOLD,
     ) -> None:
         self.routes = dict(ROUTES if routes is None else routes)
         self.threshold = threshold
         self._encoder = encoder
+        self.judge = judge
+        self.judge_threshold = judge_threshold
+        self.judged = 0
         self._indexes: dict[tuple[str, str], _Index] = {}
         self._lock = threading.Lock()
         self.vetoed = 0
+
+    @property
+    def extra_deadline_ms(self) -> float:
+        """What this matcher adds to a cache's default lookup deadline: the judge's budget, if it has one."""
+        return JUDGE_DEADLINE_MS if self.judge is not None else 0.0
 
     def model_for(self, language: str) -> str | None:
         return self.routes.get(lang_of(language))
@@ -267,6 +286,11 @@ class SemanticMatcher:
         if found is None:
             return None
         item, similarity = found
+        if self.judge is not None:
+            score = await asyncio.to_thread(self.judge.score, item.text, text or canonical)
+            if score < self.judge_threshold:
+                self.judged += 1
+                return None
         return Match(item.key, "C", item.canonical, score=similarity)
 
 

@@ -11,6 +11,7 @@ from helpers import SR, scope, tone_pcm
 
 from tts_cache import TTSCache, build_key, canonicalise
 from tts_cache.match import Matchers
+from tts_cache.match.judge import JUDGE_DEADLINE_MS, JUDGE_THRESHOLD
 from tts_cache.match.semantic import (
     DEFAULT_MODEL,
     ROUTES,
@@ -112,6 +113,7 @@ def test_embed_and_probe_within_budget(name: str, budget_ms: float) -> None:
 MEANINGS = {
     "your order will arrive on monday": 0,
     "your order is going to reach you on monday": 0,
+    "your order will arrive on tuesday": 0,  # the encoder is fooled; the slot veto is not
     "thanks for calling acme": 1,
 }
 
@@ -126,11 +128,11 @@ class StubEncoder:
         return np.stack(out)
 
 
-async def make(policy, routes=None) -> tuple[TTSCache, LogSink]:
+async def make(policy, routes=None, judge=None) -> tuple[TTSCache, LogSink]:
     sc = scope()
     memory = MemoryStore()
     semantic = SemanticMatcher(
-        routes if routes is not None else {"en": "stub"}, threshold=0.9, encoder=StubEncoder()
+        routes if routes is not None else {"en": "stub"}, threshold=0.9, encoder=StubEncoder(), judge=judge
     )
     sink = LogSink(log=None)
     cache = TTSCache(
@@ -172,3 +174,61 @@ def test_default_routes_follow_the_acceptance_check() -> None:
     assert SemanticMatcher().model_for("hi-IN") == DEFAULT_MODEL
     assert SemanticMatcher().model_for("or-IN") == DEFAULT_MODEL
     assert SemanticMatcher().model_for("fr") is None and SemanticMatcher().model_for("ne") is None
+
+
+# The judge, with a stub: the real model is tested in test_judge.py.
+
+STORED = "Your order will arrive on Monday."
+ASKED = "Your order is going to reach you on Monday."
+
+
+class StubJudge:
+    def __init__(self, value: float = 1.0, error: Exception | None = None) -> None:
+        self.value = value
+        self.error = error
+        self.calls: list[tuple[str, str]] = []
+
+    def score(self, stored: str, asked: str) -> float:
+        self.calls.append((stored, asked))
+        if self.error is not None:
+            raise self.error
+        return self.value
+
+
+async def test_level_c_serves_only_what_the_judge_accepts() -> None:
+    judge = StubJudge(JUDGE_THRESHOLD)
+    cache, sink = await make(AllOf(Probation(), MinChars(), LevelC()), judge=judge)
+    hit = await cache.lookup(ASKED)
+    assert hit is not None and hit.level == "C" and hit.spoken_text == STORED
+    assert judge.calls == [(STORED, ASKED)]
+    judge.value = JUDGE_THRESHOLD - 0.01
+    assert await cache.lookup(ASKED) is None
+    assert cache.matcher.semantic.judged == 1  # type: ignore[attr-defined]
+    assert sink.counts["hit"] == 1 and sink.counts["fail_open"] == 0
+    await cache.close()
+
+
+async def test_the_judge_sees_only_candidates_the_vetoes_let_through() -> None:
+    judge = StubJudge()
+    cache, _ = await make(AllOf(Probation(), MinChars(), LevelC()), judge=judge)
+    assert await cache.lookup("Your order will arrive on Tuesday.") is None  # a changed day: the veto refuses
+    assert await cache.lookup("Thanks for calling Acme.") is None  # another meaning: below the threshold
+    assert judge.calls == []
+    await cache.close()
+
+
+async def test_a_failing_judge_fails_open_to_a_miss() -> None:
+    cache, sink = await make(
+        AllOf(Probation(), MinChars(), LevelC()), judge=StubJudge(error=RuntimeError("boom"))
+    )
+    assert await cache.lookup(ASKED) is None
+    assert sink.counts["fail_open"] == 1
+    await cache.close()
+
+
+async def test_a_judge_extends_the_default_lookup_deadline() -> None:
+    plain, _ = await make(AllOf(Probation(), MinChars(), LevelC()))
+    judged, _ = await make(AllOf(Probation(), MinChars(), LevelC()), judge=StubJudge())
+    assert judged.deadline_s - plain.deadline_s == pytest.approx(JUDGE_DEADLINE_MS / 1000)
+    await plain.close()
+    await judged.close()

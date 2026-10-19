@@ -61,6 +61,11 @@ class Matchers:
         self.near = near
         self.semantic = semantic
 
+    @property
+    def extra_deadline_ms(self) -> float:
+        """What the matchers add to a cache's default lookup deadline (the Level C judge's budget)."""
+        return float(getattr(self.semantic, "extra_deadline_ms", 0.0))
+
     def handles(self, level: Level) -> bool:
         return {"A": self.exact, "B": self.near, "C": self.semantic}[level] is not None
 

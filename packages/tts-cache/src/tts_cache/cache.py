@@ -93,11 +93,12 @@ ProviderFn = Callable[[str], Awaitable["Audio | tuple[bytes, int]"]]
 ProviderStreamFn = Callable[[str], AsyncIterator[bytes]]
 
 
-def default_matcher(*, level_c: bool = False) -> Matcher:
+def default_matcher(*, level_c: bool = False, judge: bool = False) -> Matcher:
     """Levels A and B when the ``[similarity]`` extra is installed, otherwise Level A alone.
 
     ``level_c`` adds the Level C matcher, which serves only under a policy that
-    allows Level C (``LEVEL_C_POLICY``).
+    allows Level C (``LEVEL_C_POLICY``); ``judge`` adds it with the meaning
+    check of :mod:`tts_cache.match.judge`, loading that model now.
     """
     try:
         from tts_cache.match import Matchers
@@ -105,7 +106,14 @@ def default_matcher(*, level_c: bool = False) -> Matcher:
         from tts_cache.match.semantic import SemanticMatcher
     except ImportError:
         return ExactMatcher()
-    return Matchers(near=NearDuplicateMatcher(), semantic=SemanticMatcher() if level_c else None)
+    semantic = None
+    if judge:
+        from tts_cache.match.judge import load_judge
+
+        semantic = SemanticMatcher(judge=load_judge())
+    elif level_c:
+        semantic = SemanticMatcher()
+    return Matchers(near=NearDuplicateMatcher(), semantic=semantic)
 
 
 class TTSCache:
@@ -137,6 +145,8 @@ class TTSCache:
         if deadline_ms is None:
             # The tiered store bounds its shared tier itself; the outer deadline adds room for the decode.
             deadline_ms = store.deadline_s * 1000 + 5 if isinstance(store, TieredStore) else 20.0
+            # A Level C judge runs inside the lookup and brings its own budget.
+            deadline_ms += float(getattr(self.matcher, "extra_deadline_ms", 0.0))
         self.deadline_s = deadline_ms / 1000.0
         self.queue_size = queue_size
         self.warm_start_timeout_s = warm_start_timeout_s
