@@ -1,0 +1,3 @@
+# Leading or trailing tokens that the Level B classifier must treat as filler (tts_cache.match.lexicon.FILLERS).
+words: [okay, ok, so, well, alright, um, uh, hmm, yeah, oh, actually, basically, sure, anyway]
+phrases: ["all right", "you know", "i mean"]

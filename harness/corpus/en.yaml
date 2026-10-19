@@ -1,0 +1,1682 @@
+language: en
+bases:
+- id: en-001
+  domain: support
+  text: Good morning, this is Priya from customer care.
+  slots:
+  - span: Priya
+    kind: name
+    alts:
+    - Meera
+    - Kavya
+    - Sneha
+  paraphrase: Hello and good morning, you are through to Priya in customer care.
+  meaning_change: Good evening, this is Priya from customer care.
+- id: en-002
+  domain: support
+  text: I really appreciate your patience, Rohan!
+  slots:
+  - span: Rohan
+    kind: name
+    alts:
+    - Vikram
+    - Aditya
+    - Karan
+  paraphrase: Rohan, thank you so much for being patient with me!
+  meaning_change: I really do not appreciate your patience, Rohan!
+- id: en-003
+  domain: support
+  text: Your complaint 30417 is still open with our technical team.
+  slots:
+  - span: '30417'
+    kind: number
+    alts:
+    - '51862'
+    - '29034'
+    - '47715'
+  paraphrase: Complaint 30417 remains open and is still sitting with our technical team.
+  meaning_change: Your complaint 30417 is now closed with our technical team.
+- id: en-004
+  domain: support
+  text: Could you spell the surname Iyer for me, letter by letter?
+  slots:
+  - span: Iyer
+    kind: name
+    alts:
+    - Reddy
+    - Menon
+    - Kapoor
+  paraphrase: Would you mind spelling out Iyer for me one letter at a time?
+  meaning_change: Could you not spell the surname Iyer for me, letter by letter?
+- id: en-005
+  domain: support
+  text: I have noted that the problem started on Tuesday evening.
+  slots:
+  - span: Tuesday
+    kind: date
+    alts:
+    - Monday
+    - Wednesday
+    - Sunday
+  paraphrase: So the issue first began on Tuesday evening, and I have made a note of that.
+  meaning_change: I have noted that the problem stopped on Tuesday evening.
+- id: en-006
+  domain: support
+  text: Pulling up your account history should take only 2 minutes.
+  slots:
+  - span: '2'
+    kind: number
+    alts:
+    - '3'
+    - '5'
+    - '4'
+  paraphrase: It will just be 2 minutes while I bring up the history of your account.
+  meaning_change: Pulling up your account history should take more than 2 minutes.
+- id: en-007
+  domain: support
+  text: I am so sorry that your issue took 9 days to resolve.
+  slots:
+  - span: '9'
+    kind: number
+    alts:
+    - '6'
+    - '12'
+    - '15'
+  paraphrase: Please accept my apologies for the 9 days it took to sort out your issue.
+  meaning_change: I am so glad that your issue took 9 days to resolve.
+- id: en-009
+  domain: support
+  text: Your warranty runs until March, so this repair is free.
+  slots:
+  - span: March
+    kind: date
+    alts:
+    - June
+    - August
+    - December
+  paraphrase: This repair costs you nothing because the warranty covers you until March.
+  meaning_change: Your warranty runs until March, but this repair is not free.
+- id: en-010
+  domain: support
+  text: I will email you the case summary within 30 minutes.
+  slots:
+  - span: '30'
+    kind: number
+    alts:
+    - '45'
+    - '20'
+    - '15'
+  paraphrase: Within 30 minutes, you will get a summary of the case from me by email.
+  meaning_change: I will not email you the case summary within 30 minutes.
+- id: en-011
+  domain: support
+  text: Is error code 504 still showing on your screen?
+  slots:
+  - span: '504'
+    kind: number
+    alts:
+    - '403'
+    - '502'
+    - '401'
+  paraphrase: Do you still see the 504 error code on your screen?
+  meaning_change: Has error code 504 disappeared from your screen?
+- id: en-014
+  domain: support
+  text: I am escalating this to my supervisor, Farhan, right now.
+  slots:
+  - span: Farhan
+    kind: name
+    alts:
+    - Imran
+    - Suresh
+    - Deepak
+  paraphrase: Right now I am passing this up to Farhan, who is my supervisor.
+  meaning_change: I am not escalating this to my supervisor, Farhan, right now.
+- id: en-015
+  domain: support
+  text: Did you reinstall the app after updating to version 14?
+  slots:
+  - span: '14'
+    kind: number
+    alts:
+    - '12'
+    - '15'
+    - '13'
+  paraphrase: After you updated to version 14, did you also go ahead and reinstall the app?
+  meaning_change: Did you uninstall the app after updating to version 14?
+- id: en-016
+  domain: support
+  text: Your feedback rating of 2 stars has been shared with the manager.
+  slots:
+  - span: '2'
+    kind: number
+    alts:
+    - '3'
+    - '1'
+    - '4'
+  paraphrase: I have passed on the 2 stars you gave us to the manager.
+  meaning_change: Your feedback rating of 2 stars has not been shared with the manager.
+- id: en-017
+  domain: support
+  text: Sorry, Neha, the line dropped for a moment, are you still there?
+  slots:
+  - span: Neha
+    kind: name
+    alts:
+    - Ritu
+    - Swati
+    - Lata
+  paraphrase: Apologies, Neha, the call cut out briefly, can you still hear me?
+  meaning_change: Sorry, Neha, the line never dropped, are you still there?
+- id: en-018
+  domain: support
+  text: I can offer you a goodwill credit of $15 on your next bill.
+  slots:
+  - span: $15
+    kind: amount
+    alts:
+    - $10
+    - $20
+    - $25
+  paraphrase: As a goodwill gesture, I am able to take $15 off your next bill.
+  meaning_change: I cannot offer you a goodwill credit of $15 on your next bill.
+- id: en-019
+  domain: support
+  text: What exactly happened when you pressed the power button on Sunday?
+  slots:
+  - span: Sunday
+    kind: date
+    alts:
+    - Saturday
+    - Friday
+    - Monday
+  paraphrase: When you pressed the power button on Sunday, what did you see happen?
+  meaning_change: What exactly happened when you released the power button on Sunday?
+- id: en-020
+  domain: support
+  text: This call is recorded and kept for 90 days for quality checks.
+  slots:
+  - span: '90'
+    kind: number
+    alts:
+    - '30'
+    - '60'
+    - '180'
+  paraphrase: For quality checks, we record this call and store it for 90 days.
+  meaning_change: This call is not recorded or kept for 90 days for quality checks.
+- id: en-021
+  domain: support
+  text: Your profile is linked to the phone number ending in 4421.
+  slots:
+  - span: '4421'
+    kind: number
+    alts:
+    - '7310'
+    - '2268'
+    - '9054'
+  paraphrase: The phone number that ends in 4421 is the one tied to your profile.
+  meaning_change: Your profile is not linked to the phone number ending in 4421.
+- id: en-022
+  domain: support
+  text: Have a lovely evening, Sanjay!
+  slots:
+  - span: Sanjay
+    kind: name
+    alts:
+    - Mohan
+    - Ajay
+    - Prakash
+  paraphrase: Sanjay, I hope the rest of your evening is lovely!
+  meaning_change: Have a terrible evening, Sanjay!
+- id: en-024
+  domain: support
+  text: Would a callback at 6 pm work better for you?
+  slots:
+  - span: 6 pm
+    kind: date
+    alts:
+    - 5 pm
+    - 7 pm
+    - 4 pm
+  paraphrase: Would it suit you more if we called you back at 6 pm?
+  meaning_change: Would a callback at 6 pm work worse for you?
+- id: en-025
+  domain: support
+  text: I understand how frustrating it is to lose 3 hours of work.
+  slots:
+  - span: '3'
+    kind: number
+    alts:
+    - '2'
+    - '4'
+    - '5'
+  paraphrase: Losing 3 hours of work must be really frustrating, and I completely get that.
+  meaning_change: I do not understand how frustrating it is to lose 3 hours of work.
+- id: en-026
+  domain: support
+  text: Unfortunately, the product you bought from Zenith is no longer under support.
+  slots:
+  - span: Zenith
+    kind: name
+    alts:
+    - Orbit
+    - Nova
+    - Vertex
+  paraphrase: Sadly, support has ended for the product you purchased from Zenith.
+  meaning_change: Fortunately, the product you bought from Zenith is still under support.
+- id: en-027
+  domain: support
+  text: Shall I stay on the line until the 800 MB download finishes?
+  slots:
+  - span: '800'
+    kind: number
+    alts:
+    - '500'
+    - '650'
+    - '900'
+  paraphrase: Do you want me to remain on the call while the 800 MB download completes?
+  meaning_change: Shall I hang up before the 800 MB download finishes?
+- id: en-029
+  domain: support
+  text: Hello, am I speaking with Mrs Kulkarni?
+  slots:
+  - span: Kulkarni
+    kind: name
+    alts:
+    - Joshi
+    - Patil
+    - Deshmukh
+  paraphrase: Hi there, is this Mrs Kulkarni on the line?
+  meaning_change: Hello, am I not speaking with Mrs Kulkarni?
+- id: en-030
+  domain: support
+  text: Just to confirm, the app crashed twice on 3 October?
+  slots:
+  - span: 3 October
+    kind: date
+    alts:
+    - 5 October
+    - 9 October
+    - 28 September
+  paraphrase: So, to be sure, on 3 October the app crashed on you twice?
+  meaning_change: Just to confirm, the app never crashed on 3 October?
+- id: en-032
+  domain: support
+  text: The replacement kit costs $12 including shipping.
+  slots:
+  - span: $12
+    kind: amount
+    alts:
+    - $9
+    - $18
+    - $14
+  paraphrase: Including shipping, you will pay $12 for the replacement kit.
+  meaning_change: The replacement kit costs $12 excluding shipping.
+- id: en-033
+  domain: support
+  text: Before I close ticket 77215, is everything working as expected?
+  slots:
+  - span: '77215'
+    kind: number
+    alts:
+    - '63098'
+    - '81442'
+    - '70531'
+  paraphrase: Is everything working the way it should before I go ahead and close ticket 77215?
+  meaning_change: Before I reopen ticket 77215, is everything working as expected?
+- id: en-034
+  domain: support
+  text: My colleague Tanvi will follow up with you by Thursday.
+  slots:
+  - span: Tanvi
+    kind: name
+    alts:
+    - Isha
+    - Rhea
+    - Asha
+  paraphrase: You will hear back from my colleague Tanvi no later than Thursday.
+  meaning_change: My colleague Tanvi will not follow up with you by Thursday.
+- id: en-035
+  domain: banking
+  text: Welcome to Sterling Bank, how may I help you today?
+  slots:
+  - span: Sterling
+    kind: name
+    alts:
+    - Horizon
+    - Crescent
+    - Summit
+  paraphrase: Thank you for calling Sterling Bank, what can I do for you today?
+  meaning_change: Welcome to Sterling Bank, I am afraid I cannot help you today.
+- id: en-037
+  domain: banking
+  text: Did you make a purchase of ₹3,999 at an electronics store last night?
+  slots:
+  - span: ₹3,999
+    kind: amount
+    alts:
+    - ₹4,499
+    - ₹2,850
+    - ₹5,200
+  paraphrase: Was it you who spent ₹3,999 at an electronics shop last night?
+  meaning_change: Did you cancel a purchase of ₹3,999 at an electronics store last night?
+- id: en-038
+  domain: banking
+  text: I have frozen your credit card ending in 7782 to stop further misuse.
+  slots:
+  - span: '7782'
+    kind: number
+    alts:
+    - '6194'
+    - '3027'
+    - '8850'
+  paraphrase: To prevent any more misuse, the credit card that ends in 7782 is now frozen.
+  meaning_change: I have unfrozen your credit card ending in 7782 to stop further misuse.
+- id: en-040
+  domain: banking
+  text: The interest rate on a one year deposit is 7 percent.
+  slots:
+  - span: '7'
+    kind: number
+    alts:
+    - '6'
+    - '8'
+    - '9'
+  paraphrase: For a deposit of one year, we offer interest at 7 percent.
+  meaning_change: The interest rate on a one year deposit is above 7 percent.
+- id: en-041
+  domain: banking
+  text: Done, Arjun, your new PIN is all set!
+  slots:
+  - span: Arjun
+    kind: name
+    alts:
+    - Varun
+    - Nikhil
+    - Rahul
+  paraphrase: Arjun, you are good to go, the new PIN is active!
+  meaning_change: Sorry, Arjun, your new PIN is not set!
+- id: en-042
+  domain: banking
+  text: Would you like a statement for the last 6 months emailed to you?
+  slots:
+  - span: '6'
+    kind: number
+    alts:
+    - '3'
+    - '12'
+    - '9'
+  paraphrase: Shall I email you an account statement covering the past 6 months?
+  meaning_change: Would you prefer not to have a statement for the last 6 months emailed to you?
+- id: en-043
+  domain: banking
+  text: The cheque you deposited on Wednesday has bounced due to insufficient funds.
+  slots:
+  - span: Wednesday
+    kind: date
+    alts:
+    - Monday
+    - Tuesday
+    - Friday
+  paraphrase: Due to a lack of funds, the cheque deposited by you on Wednesday was returned unpaid.
+  meaning_change: The cheque you deposited on Wednesday has not bounced due to insufficient funds.
+- id: en-044
+  domain: banking
+  text: Our bank will never ask for your 6 digit OTP over the phone.
+  slots:
+  - span: '6'
+    kind: number
+    alts:
+    - '4'
+    - '8'
+    - '5'
+  paraphrase: At no point will we ask you to read out your 6 digit OTP on a call.
+  meaning_change: Our bank will always ask for your 6 digit OTP over the phone.
+- id: en-045
+  domain: banking
+  text: How much would you like to transfer to Kiran today?
+  slots:
+  - span: Kiran
+    kind: name
+    alts:
+    - Sunil
+    - Manoj
+    - Gita
+  paraphrase: What amount do you want to send over to Kiran today?
+  meaning_change: How much would you like to receive from Kiran today?
+- id: en-046
+  domain: banking
+  text: Your personal loan of ₹2,00,000 has been approved!
+  slots:
+  - span: ₹2,00,000
+    kind: amount
+    alts:
+    - ₹1,50,000
+    - ₹3,00,000
+    - ₹2,50,000
+  paraphrase: Good news, we have sanctioned your ₹2,00,000 personal loan!
+  meaning_change: Your personal loan of ₹2,00,000 has been rejected!
+- id: en-047
+  domain: banking
+  text: A late payment fee of ₹750 applies if you pay after the 15th.
+  slots:
+  - span: ₹750
+    kind: amount
+    alts:
+    - ₹500
+    - ₹950
+    - ₹600
+  paraphrase: If payment reaches us after the 15th, you will be charged a ₹750 late fee.
+  meaning_change: A late payment fee of ₹750 applies if you pay before the 15th.
+- id: en-048
+  domain: banking
+  text: For your safety, I will ask you 3 quick security questions now.
+  slots:
+  - span: '3'
+    kind: number
+    alts:
+    - '2'
+    - '4'
+    - '5'
+  paraphrase: To keep your account safe, I need to go through 3 short security questions with you.
+  meaning_change: For your safety, I will not ask you 3 quick security questions now.
+- id: en-049
+  domain: banking
+  text: Will you be travelling abroad in December, so we can enable your card overseas?
+  slots:
+  - span: December
+    kind: date
+    alts:
+    - November
+    - January
+    - October
+  paraphrase: Are you going overseas in December, so that we can turn on international use for your card?
+  meaning_change: Will you be staying home in December, so we can enable your card overseas?
+- id: en-050
+  domain: banking
+  text: The branch at Koramangala closes at 4 pm on Saturdays.
+  slots:
+  - span: 4 pm
+    kind: date
+    alts:
+    - 3 pm
+    - 2 pm
+    - 5 pm
+  paraphrase: On Saturdays, our Koramangala branch shuts its doors at 4 pm.
+  meaning_change: The branch at Koramangala opens at 4 pm on Saturdays.
+- id: en-053
+  domain: banking
+  text: Thanks for banking with us, Meenakshi, goodbye!
+  slots:
+  - span: Meenakshi
+    kind: name
+    alts:
+    - Revathi
+    - Shalini
+    - Bhavana
+  paraphrase: Goodbye, Meenakshi, and thank you for choosing to bank with us!
+  meaning_change: Sorry you stopped banking with us, Meenakshi, goodbye!
+- id: en-054
+  domain: banking
+  text: Do you want the money credited to your account ending in 3390?
+  slots:
+  - span: '3390'
+    kind: number
+    alts:
+    - '1475'
+    - '8206'
+    - '5643'
+  paraphrase: Should the funds go into the account that ends in 3390?
+  meaning_change: Do you want the money debited from your account ending in 3390?
+- id: en-056
+  domain: banking
+  text: Please hold for a moment while I verify your identity, Mr Shah.
+  slots:
+  - span: Shah
+    kind: name
+    alts:
+    - Mehta
+    - Desai
+    - Bose
+  paraphrase: Mr Shah, kindly stay on the line briefly as I confirm who you are.
+  meaning_change: Please hang up for a moment while I verify your identity, Mr Shah.
+- id: en-057
+  domain: banking
+  text: Your KYC documents uploaded on 2 August were rejected because the photo was blurry.
+  slots:
+  - span: 2 August
+    kind: date
+    alts:
+    - 9 August
+    - 27 July
+    - 14 August
+  paraphrase: We turned down the KYC documents you sent on 2 August since the photo was unclear.
+  meaning_change: Your KYC documents uploaded on 2 August were accepted although the photo was blurry.
+- id: en-058
+  domain: banking
+  text: Sending less than ₹10,000 by NEFT will not cost you a single rupee.
+  slots:
+  - span: ₹10,000
+    kind: amount
+    alts:
+    - ₹5,000
+    - ₹25,000
+    - ₹20,000
+  paraphrase: You will not pay a single rupee for any NEFT transfer under ₹10,000.
+  meaning_change: Sending less than ₹10,000 by NEFT will cost you a fee.
+- id: en-059
+  domain: banking
+  text: Is the payment to QuickMart on Friday one you recognise?
+  slots:
+  - span: QuickMart
+    kind: name
+    alts:
+    - FreshCart
+    - MegaMart
+    - CityBazaar
+  paraphrase: Do you recognise the Friday payment that went to QuickMart?
+  meaning_change: Is the payment to QuickMart on Friday one you dispute?
+- id: en-060
+  domain: banking
+  text: Your replacement debit card should reach you in 4 working days.
+  slots:
+  - span: '4'
+    kind: number
+    alts:
+    - '5'
+    - '3'
+    - '6'
+  paraphrase: Expect the new debit card we are sending to arrive within 4 working days.
+  meaning_change: Your replacement debit card will not reach you in 4 working days.
+- id: en-061
+  domain: banking
+  text: Wow, you have earned 2,400 reward points this month!
+  slots:
+  - span: 2,400
+    kind: number
+    alts:
+    - 1,800
+    - 3,100
+    - 2,750
+  paraphrase: This month alone, you have collected 2,400 reward points!
+  meaning_change: Oh no, you have lost 2,400 reward points this month!
+- id: en-062
+  domain: banking
+  text: I am afraid we cannot close the account while ₹8,600 is still owed on your loan.
+  slots:
+  - span: ₹8,600
+    kind: amount
+    alts:
+    - ₹7,200
+    - ₹9,450
+    - ₹6,800
+  paraphrase: Unfortunately, with ₹8,600 still outstanding on your loan, closing the account is not possible.
+  meaning_change: I am happy to say we can close the account while ₹8,600 is still owed on your loan.
+- id: en-063
+  domain: banking
+  text: Should I set up an auto debit for the 1st of every month?
+  slots:
+  - span: 1st
+    kind: date
+    alts:
+    - 5th
+    - 10th
+    - 7th
+  paraphrase: Would you like the amount to be debited automatically on the 1st of each month?
+  meaning_change: Should I cancel the auto debit for the 1st of every month?
+- id: en-064
+  domain: banking
+  text: Your nominee, Lakshmi, has been added to the account.
+  slots:
+  - span: Lakshmi
+    kind: name
+    alts:
+    - Saraswati
+    - Parvati
+    - Radha
+  paraphrase: We have now registered Lakshmi as the nominee on your account.
+  meaning_change: Your nominee, Lakshmi, has been removed from the account.
+- id: en-066
+  domain: banking
+  text: Is this a good time to discuss the gold loan renewal due on 30 November?
+  slots:
+  - span: 30 November
+    kind: date
+    alts:
+    - 15 November
+    - 2 December
+    - 22 November
+  paraphrase: Can we talk now about renewing the gold loan that falls due on 30 November?
+  meaning_change: Is this a bad time to discuss the gold loan renewal due on 30 November?
+- id: en-067
+  domain: banking
+  text: Your UPI limit is ₹1,00,000 per day.
+  slots:
+  - span: ₹1,00,000
+    kind: amount
+    alts:
+    - ₹50,000
+    - ₹25,000
+    - ₹2,00,000
+  paraphrase: Each day, you can send up to ₹1,00,000 through UPI.
+  meaning_change: Your UPI limit is ₹1,00,000 per month.
+- id: en-068
+  domain: banking
+  text: Hello, this is the fraud prevention desk, we noticed unusual activity on card 5517.
+  slots:
+  - span: '5517'
+    kind: number
+    alts:
+    - '2093'
+    - '6648'
+    - '4120'
+  paraphrase: Hi, we are calling from fraud prevention because card 5517 shows some unusual activity.
+  meaning_change: Hello, this is the fraud prevention desk, we noticed no unusual activity on card 5517.
+- id: en-069
+  domain: delivery
+  text: Hi, I am Suresh, your delivery partner for today.
+  slots:
+  - span: Suresh
+    kind: name
+    alts:
+    - Ramesh
+    - Ganesh
+    - Mahesh
+  paraphrase: Hello, my name is Suresh and I will be the one delivering to you today.
+  meaning_change: Hi, I am Suresh, but I am not your delivery partner for today.
+- id: en-072
+  domain: delivery
+  text: Is the green house next to Sharma Sweets yours?
+  slots:
+  - span: Sharma Sweets
+    kind: name
+    alts:
+    - Gupta Bakery
+    - Bansal Stores
+    - Agarwal Dairy
+  paraphrase: Do you live in the green house right beside Sharma Sweets?
+  meaning_change: Is the green house far from Sharma Sweets yours?
+- id: en-073
+  domain: delivery
+  text: Our courier tried to reach you at 11 am but your phone was switched off.
+  slots:
+  - span: 11 am
+    kind: date
+    alts:
+    - 10 am
+    - 12 pm
+    - 9 am
+  paraphrase: When our courier called you at 11 am, your phone was switched off.
+  meaning_change: Our courier tried to reach you at 11 am and your phone was switched on.
+- id: en-075
+  domain: delivery
+  text: Your shoes from Stride are delivered, enjoy!
+  slots:
+  - span: Stride
+    kind: name
+    alts:
+    - Pace
+    - Footloose
+    - Walkway
+  paraphrase: Enjoy, the shoes you ordered from Stride have now been delivered!
+  meaning_change: Your shoes from Stride are not delivered, sorry!
+- id: en-077
+  domain: delivery
+  text: Sorry, your order is delayed by 2 days due to heavy rain in Chennai.
+  slots:
+  - span: '2'
+    kind: number
+    alts:
+    - '3'
+    - '4'
+    - '5'
+  paraphrase: I apologise, but heavy rain in Chennai has pushed your order back by 2 days.
+  meaning_change: Luckily, your order is not delayed by 2 days due to heavy rain in Chennai.
+- id: en-078
+  domain: delivery
+  text: Please share the 4 digit code with the rider when he arrives.
+  slots:
+  - span: '4'
+    kind: number
+    alts:
+    - '6'
+    - '5'
+    - '3'
+  paraphrase: When the rider gets to you, kindly give him the 4 digit code.
+  meaning_change: Please do not share the 4 digit code with the rider when he arrives.
+- id: en-079
+  domain: delivery
+  text: Your grocery order has 2 items out of stock.
+  slots:
+  - span: '2'
+    kind: number
+    alts:
+    - '3'
+    - '1'
+    - '4'
+  paraphrase: In your grocery order, 2 of the items are currently unavailable.
+  meaning_change: Your grocery order has 2 items back in stock.
+- id: en-080
+  domain: delivery
+  text: Should I leave the parcel with Raju at the security desk?
+  slots:
+  - span: Raju
+    kind: name
+    alts:
+    - Babu
+    - Shankar
+    - Gopal
+  paraphrase: Is it fine if I hand the parcel over to Raju at the security desk?
+  meaning_change: Should I take the parcel back from Raju at the security desk?
+- id: en-081
+  domain: delivery
+  text: We picked up your return on 9 September and it is on its way to our warehouse.
+  slots:
+  - span: 9 September
+    kind: date
+    alts:
+    - 7 September
+    - 12 September
+    - 30 August
+  paraphrase: Your return was collected on 9 September and is now heading to our warehouse.
+  meaning_change: We did not pick up your return on 9 September and it is not on its way to our warehouse.
+- id: en-082
+  domain: delivery
+  text: Is anyone available to sign for the package before 5 pm?
+  slots:
+  - span: 5 pm
+    kind: date
+    alts:
+    - 4 pm
+    - 6 pm
+    - 3 pm
+  paraphrase: Will there be someone at home to sign for the package ahead of 5 pm?
+  meaning_change: Is anyone available to sign for the package after 5 pm?
+- id: en-084
+  domain: delivery
+  text: The address on the order says flat 302, is that correct?
+  slots:
+  - span: '302'
+    kind: number
+    alts:
+    - '204'
+    - '501'
+    - '108'
+  paraphrase: Can you confirm that you live in flat 302, as written on the order?
+  meaning_change: The address on the order says flat 302, is that wrong?
+- id: en-085
+  domain: delivery
+  text: Unfortunately, we do not deliver to pin code 560099 yet.
+  slots:
+  - span: '560099'
+    kind: number
+    alts:
+    - '560034'
+    - '411045'
+    - '400076'
+  paraphrase: I am sorry, but pin code 560099 is not yet covered by our delivery service.
+  meaning_change: Fortunately, we now deliver to pin code 560099.
+- id: en-086
+  domain: delivery
+  text: Your cake will arrive fresh in 40 minutes!
+  slots:
+  - span: '40'
+    kind: number
+    alts:
+    - '25'
+    - '35'
+    - '50'
+  paraphrase: In 40 minutes, your cake will be at your door, nice and fresh!
+  meaning_change: Your cake will not arrive fresh in 40 minutes!
+- id: en-087
+  domain: delivery
+  text: I am about 200 metres from you, can you guide me to your house?
+  slots:
+  - span: '200'
+    kind: number
+    alts:
+    - '300'
+    - '150'
+    - '500'
+  paraphrase: Could you direct me to your house, since I am roughly 200 metres away?
+  meaning_change: I am about 200 metres past you, can you guide me to your house?
+- id: en-088
+  domain: delivery
+  text: Your exchange for a size 42 shirt has been approved.
+  slots:
+  - span: '42'
+    kind: number
+    alts:
+    - '40'
+    - '44'
+    - '38'
+  paraphrase: We have approved swapping your shirt for one in size 42.
+  meaning_change: Your exchange for a size 42 shirt has been declined.
+- id: en-089
+  domain: delivery
+  text: Thank you for shopping with Kartly!
+  slots:
+  - span: Kartly
+    kind: name
+    alts:
+    - Shopsy
+    - Bazaarly
+    - Cartwise
+  paraphrase: We really appreciate you choosing Kartly for your shopping!
+  meaning_change: Sorry you stopped shopping with Kartly!
+- id: en-090
+  domain: delivery
+  text: Please check that the seal is intact before you pay the ₹2,199.
+  slots:
+  - span: ₹2,199
+    kind: amount
+    alts:
+    - ₹1,799
+    - ₹2,499
+    - ₹3,050
+  paraphrase: Before handing over the ₹2,199, kindly make sure the seal is unbroken.
+  meaning_change: Please check that the seal is broken before you pay the ₹2,199.
+- id: en-091
+  domain: delivery
+  text: Do you want a contactless drop at your door for order 66410?
+  slots:
+  - span: '66410'
+    kind: number
+    alts:
+    - '58233'
+    - '71904'
+    - '60087'
+  paraphrase: For order 66410, shall we leave it at your door without any contact?
+  meaning_change: Do you want a hand-to-hand delivery for order 66410?
+- id: en-092
+  domain: delivery
+  text: Our rider Imtiaz has picked up your food from the restaurant.
+  slots:
+  - span: Imtiaz
+    kind: name
+    alts:
+    - Salim
+    - Arif
+    - Javed
+  paraphrase: Imtiaz, who is our rider, has collected your food at the restaurant.
+  meaning_change: Our rider Imtiaz has not picked up your food from the restaurant.
+- id: en-093
+  domain: delivery
+  text: Sorry for the damaged lamp, we will send a new one by Tuesday.
+  slots:
+  - span: Tuesday
+    kind: date
+    alts:
+    - Wednesday
+    - Monday
+    - Thursday
+  paraphrase: I apologise that the lamp arrived damaged, and a replacement will reach you by Tuesday.
+  meaning_change: Sorry for the damaged lamp, we will not send a new one by Tuesday.
+- id: en-094
+  domain: delivery
+  text: The delivery window you chose is 7 am to 9 am.
+  slots:
+  - span: 7 am
+    kind: date
+    alts:
+    - 6 am
+    - 8 am
+    - 5 am
+  paraphrase: You picked a delivery slot running between 7 am and 9 am.
+  meaning_change: The delivery window you rejected is 7 am to 9 am.
+- id: en-095
+  domain: delivery
+  text: Can the furniture team come on 21 January to assemble the bed?
+  slots:
+  - span: 21 January
+    kind: date
+    alts:
+    - 24 January
+    - 18 January
+    - 2 February
+  paraphrase: Would 21 January work for our furniture team to come and put the bed together?
+  meaning_change: Can the furniture team come on 21 January to dismantle the bed?
+- id: en-097
+  domain: delivery
+  text: Hooray, Simran, your first order ships for free!
+  slots:
+  - span: Simran
+    kind: name
+    alts:
+    - Jasleen
+    - Harpreet
+    - Manpreet
+  paraphrase: Simran, since this is your very first order, you get free shipping!
+  meaning_change: Sorry, Simran, your first order does not ship for free!
+- id: en-098
+  domain: delivery
+  text: Your parcel is on hold at our hub for 3 days because the address was incomplete.
+  slots:
+  - span: '3'
+    kind: number
+    alts:
+    - '2'
+    - '4'
+    - '5'
+  paraphrase: Since the address was incomplete, we have kept your parcel at our hub for 3 days.
+  meaning_change: Your parcel is on hold at our hub for 3 days although the address was complete.
+- id: en-099
+  domain: delivery
+  text: Shall I reschedule the delivery to next Monday?
+  slots:
+  - span: Monday
+    kind: date
+    alts:
+    - Tuesday
+    - Wednesday
+    - Friday
+  paraphrase: Do you want me to move the delivery over to next Monday instead?
+  meaning_change: Shall I cancel the delivery for next Monday?
+- id: en-100
+  domain: delivery
+  text: Your order from MediPlus needs a valid prescription before we can ship it.
+  slots:
+  - span: MediPlus
+    kind: name
+    alts:
+    - HealthKart
+    - PharmEasy
+    - CareMeds
+  paraphrase: Before we can send out your MediPlus order, we need a valid prescription.
+  meaning_change: Your order from MediPlus does not need a valid prescription before we can ship it.
+- id: en-101
+  domain: delivery
+  text: Your tracking ID is 90214.
+  slots:
+  - span: '90214'
+    kind: number
+    alts:
+    - '83107'
+    - '92655'
+    - '70348'
+  paraphrase: The ID for tracking your shipment is 90214.
+  meaning_change: Your tracking ID is no longer 90214.
+- id: en-102
+  domain: delivery
+  text: Our rider Kabir will reach you in 10 minutes, please keep your phone handy.
+  slots:
+  - span: Kabir
+    kind: name
+    alts:
+    - Aman
+    - Rehan
+    - Yash
+  paraphrase: Please keep your phone close, since our rider Kabir is about 10 minutes away.
+  meaning_change: Our rider Kabir will not reach you in 10 minutes, please keep your phone handy.
+- id: en-103
+  domain: telecom
+  text: Thank you for calling Zipnet, my name is Arun.
+  slots:
+  - span: Zipnet
+    kind: name
+    alts:
+    - Linkon
+    - Airwave
+    - Netstar
+  paraphrase: You have reached Zipnet, and this is Arun speaking.
+  meaning_change: Thank you for calling Zipnet, my name is not Arun.
+- id: en-104
+  domain: telecom
+  text: Your prepaid validity ends on 25 July.
+  slots:
+  - span: 25 July
+    kind: date
+    alts:
+    - 18 July
+    - 3 August
+    - 29 July
+  paraphrase: On 25 July, the validity of your prepaid plan comes to an end.
+  meaning_change: Your prepaid validity starts on 25 July.
+- id: en-105
+  domain: telecom
+  text: Are all 4 lights on your router glowing green right now?
+  slots:
+  - span: '4'
+    kind: number
+    alts:
+    - '3'
+    - '5'
+    - '2'
+  paraphrase: Right now, do you see all 4 router lights showing green?
+  meaning_change: Are all 4 lights on your router glowing red right now?
+- id: en-106
+  domain: telecom
+  text: Your bill this month is higher because of ₹350 in roaming charges.
+  slots:
+  - span: ₹350
+    kind: amount
+    alts:
+    - ₹420
+    - ₹275
+    - ₹510
+  paraphrase: Roaming charges of ₹350 are the reason this month's bill went up.
+  meaning_change: Your bill this month is lower because of ₹350 in roaming charges.
+- id: en-107
+  domain: telecom
+  text: I have activated the unlimited calling pack for 28 days.
+  slots:
+  - span: '28'
+    kind: number
+    alts:
+    - '56'
+    - '84'
+    - '30'
+  paraphrase: The unlimited calling pack is now active on your number for 28 days.
+  meaning_change: I have deactivated the unlimited calling pack for 28 days.
+- id: en-108
+  domain: telecom
+  text: Could you restart your phone and wait for 30 seconds?
+  slots:
+  - span: '30'
+    kind: number
+    alts:
+    - '20'
+    - '45'
+    - '60'
+  paraphrase: Would you mind rebooting your phone and then giving it 30 seconds?
+  meaning_change: Could you avoid restarting your phone and wait for 30 seconds?
+- id: en-109
+  domain: telecom
+  text: The fibre installation at your address is booked for Friday morning.
+  slots:
+  - span: Friday
+    kind: date
+    alts:
+    - Thursday
+    - Saturday
+    - Monday
+  paraphrase: We have scheduled the fibre to be installed at your address on Friday morning.
+  meaning_change: The fibre installation at your address is cancelled for Friday morning.
+- id: en-112
+  domain: telecom
+  text: Do you want to port your number from Skyline to us?
+  slots:
+  - span: Skyline
+    kind: name
+    alts:
+    - Bluewave
+    - Teleon
+    - Signex
+  paraphrase: Are you looking to move your number over to us from Skyline?
+  meaning_change: Do you want to port your number from us to Skyline?
+- id: en-113
+  domain: telecom
+  text: The outage in Sector 14 should be fixed by 8 pm.
+  slots:
+  - span: 8 pm
+    kind: date
+    alts:
+    - 7 pm
+    - 9 pm
+    - 10 pm
+  paraphrase: We expect to restore service in Sector 14 by 8 pm.
+  meaning_change: The outage in Sector 14 will not be fixed by 8 pm.
+- id: en-114
+  domain: telecom
+  text: For the SIM swap, please visit our store with ID proof within 72 hours.
+  slots:
+  - span: '72'
+    kind: number
+    alts:
+    - '24'
+    - '48'
+    - '96'
+  paraphrase: Kindly bring an ID proof to our store within 72 hours to complete the SIM swap.
+  meaning_change: For the SIM swap, you do not need to visit our store with ID proof within 72 hours.
+- id: en-115
+  domain: telecom
+  text: Hello, Fatima, can you hear me clearly now?
+  slots:
+  - span: Fatima
+    kind: name
+    alts:
+    - Ayesha
+    - Zainab
+    - Sana
+  paraphrase: Hi Fatima, is my voice coming through clearly now?
+  meaning_change: Hello, Fatima, is my voice breaking up now?
+- id: en-116
+  domain: telecom
+  text: I see 3 failed recharges on your number today.
+  slots:
+  - span: '3'
+    kind: number
+    alts:
+    - '2'
+    - '4'
+    - '5'
+  paraphrase: Today, 3 unsuccessful recharge attempts show up on your number.
+  meaning_change: I see 3 successful recharges on your number today.
+- id: en-117
+  domain: telecom
+  text: Your family plan allows up to 4 members to share 200 GB.
+  slots:
+  - span: '4'
+    kind: number
+    alts:
+    - '3'
+    - '5'
+    - '6'
+  paraphrase: Under your family plan, as many as 4 members can share 200 GB between them.
+  meaning_change: Your family plan does not allow up to 4 members to share 200 GB.
+- id: en-118
+  domain: telecom
+  text: Would you like to upgrade to the ₹599 plan with OTT apps included?
+  slots:
+  - span: ₹599
+    kind: amount
+    alts:
+    - ₹699
+    - ₹499
+    - ₹799
+  paraphrase: Are you interested in moving up to the ₹599 plan that comes with OTT apps?
+  meaning_change: Would you like to downgrade to the ₹599 plan with OTT apps included?
+- id: en-119
+  domain: telecom
+  text: Engineer Vinod is assigned to your complaint and will reach between 2 pm and 4 pm.
+  slots:
+  - span: Vinod
+    kind: name
+    alts:
+    - Ashok
+    - Rakesh
+    - Naveen
+  paraphrase: Your complaint has been given to engineer Vinod, who will arrive between 2 pm and 4 pm.
+  meaning_change: Engineer Vinod is not assigned to your complaint and will not reach between 2 pm and 4 pm.
+- id: en-121
+  domain: telecom
+  text: Why not try our annual plan and save ₹1,200?
+  slots:
+  - span: ₹1,200
+    kind: amount
+    alts:
+    - ₹900
+    - ₹1,500
+    - ₹1,000
+  paraphrase: How about choosing the yearly plan so that you save ₹1,200?
+  meaning_change: Why not try our annual plan and lose ₹1,200?
+- id: en-122
+  domain: telecom
+  text: Please dial 198 from your registered number to log a complaint.
+  slots:
+  - span: '198'
+    kind: number
+    alts:
+    - '199'
+    - '121'
+    - '155'
+  paraphrase: To register a complaint, call 198 from the number registered with us.
+  meaning_change: Please do not dial 198 from your registered number to log a complaint.
+- id: en-124
+  domain: telecom
+  text: Is the slow speed only on your laptop, or on all 5 devices at home?
+  slots:
+  - span: '5'
+    kind: number
+    alts:
+    - '3'
+    - '4'
+    - '6'
+  paraphrase: Are all 5 devices at home running slow, or is it just your laptop?
+  meaning_change: Is the fast speed only on your laptop, or on all 5 devices at home?
+- id: en-126
+  domain: telecom
+  text: International calls to Dubai are charged at ₹12 per minute.
+  slots:
+  - span: ₹12
+    kind: amount
+    alts:
+    - ₹10
+    - ₹15
+    - ₹8
+  paraphrase: Each minute of an international call to Dubai costs ₹12.
+  meaning_change: International calls to Dubai are not charged at ₹12 per minute.
+- id: en-127
+  domain: telecom
+  text: The 5G service will be available in your area from November.
+  slots:
+  - span: November
+    kind: date
+    alts:
+    - October
+    - January
+    - March
+  paraphrase: Starting in November, you will be able to use 5G service in your area.
+  meaning_change: The 5G service will be unavailable in your area from November.
+- id: en-128
+  domain: telecom
+  text: Shall I send the APN setup steps to your number ending 8812 by SMS?
+  slots:
+  - span: '8812'
+    kind: number
+    alts:
+    - '4307'
+    - '1956'
+    - '6630'
+  paraphrase: Would you like the APN setup steps by SMS on the number that ends 8812?
+  meaning_change: Shall I stop sending the APN setup steps to your number ending 8812 by SMS?
+- id: en-129
+  domain: telecom
+  text: Good evening, I am calling about your broadband renewal due on Monday.
+  slots:
+  - span: Monday
+    kind: date
+    alts:
+    - Tuesday
+    - Thursday
+    - Wednesday
+  paraphrase: Hello and good evening, this call is regarding the broadband renewal that falls due on Monday.
+  meaning_change: Good evening, I am calling about your broadband cancellation due on Monday.
+- id: en-131
+  domain: telecom
+  text: Sorry, this offer is only valid for new customers who join before 31 December.
+  slots:
+  - span: 31 December
+    kind: date
+    alts:
+    - 15 December
+    - 31 January
+    - 20 December
+  paraphrase: I apologise, but only new customers joining before 31 December can get this offer.
+  meaning_change: Sorry, this offer is only valid for existing customers who join before 31 December.
+- id: en-132
+  domain: telecom
+  text: Has the internet dropped more than 6 times since yesterday?
+  slots:
+  - span: '6'
+    kind: number
+    alts:
+    - '4'
+    - '8'
+    - '10'
+  paraphrase: Since yesterday, has your internet connection gone down over 6 times?
+  meaning_change: Has the internet dropped fewer than 6 times since yesterday?
+- id: en-133
+  domain: telecom
+  text: Your data rollover of 12 GB has been added to this cycle.
+  slots:
+  - span: '12'
+    kind: number
+    alts:
+    - '8'
+    - '15'
+    - '10'
+  paraphrase: We have carried 12 GB of unused data over into this billing cycle.
+  meaning_change: Your data rollover of 12 GB has been removed from this cycle.
+- id: en-134
+  domain: telecom
+  text: Awesome, your number is now unblocked, Harish!
+  slots:
+  - span: Harish
+    kind: name
+    alts:
+    - Girish
+    - Satish
+    - Manish
+  paraphrase: Harish, good news, the block on your number has been lifted!
+  meaning_change: Sorry, your number is still blocked, Harish!
+- id: en-135
+  domain: telecom
+  text: I am transferring you to Mansi in our billing team, please stay connected.
+  slots:
+  - span: Mansi
+    kind: name
+    alts:
+    - Ruchi
+    - Preeti
+    - Jyoti
+  paraphrase: Please stay on the call while I put you through to Mansi from billing.
+  meaning_change: I am not transferring you to Mansi in our billing team, please stay connected.
+- id: en-136
+  domain: telecom
+  text: To keep your number active, recharge with at least ₹155 every month.
+  slots:
+  - span: ₹155
+    kind: amount
+    alts:
+    - ₹199
+    - ₹179
+    - ₹129
+  paraphrase: Your number will stay active only if you recharge for a minimum of ₹155 each month.
+  meaning_change: To keep your number active, you need not recharge with ₹155 every month.
+- id: en-137
+  domain: appointments
+  text: Good afternoon, Sunrise Clinic, how can I help?
+  slots:
+  - span: Sunrise
+    kind: name
+    alts:
+    - Lotus
+    - Silverline
+    - Evergreen
+  paraphrase: Hello, you have reached Sunrise Clinic this afternoon, what can I do for you?
+  meaning_change: Good afternoon, Sunrise Clinic, I am afraid I cannot help.
+- id: en-138
+  domain: appointments
+  text: Which doctor would you like to see, Doctor Rao or Doctor Sen?
+  slots:
+  - span: Rao
+    kind: name
+    alts:
+    - Gupta
+    - Naidu
+    - Chawla
+  paraphrase: Would you prefer an appointment with Doctor Rao or with Doctor Sen?
+  meaning_change: Which doctor would you like to avoid, Doctor Rao or Doctor Sen?
+- id: en-139
+  domain: appointments
+  text: Your dental cleaning is booked for 10 am on Thursday.
+  slots:
+  - span: 10 am
+    kind: date
+    alts:
+    - 11 am
+    - 9 am
+    - 12 pm
+  paraphrase: We have reserved a 10 am slot on Thursday for your dental cleaning.
+  meaning_change: Your dental cleaning is cancelled for 10 am on Thursday.
+- id: en-140
+  domain: appointments
+  text: The consultation fee is ₹800, payable at the reception.
+  slots:
+  - span: ₹800
+    kind: amount
+    alts:
+    - ₹600
+    - ₹1,000
+    - ₹750
+  paraphrase: You will need to pay ₹800 at the reception as the fee for the consultation.
+  meaning_change: The consultation fee is ₹800, not payable at the reception.
+- id: en-141
+  domain: appointments
+  text: Have you visited the Whitefield branch before, Nandini?
+  slots:
+  - span: Nandini
+    kind: name
+    alts:
+    - Sowmya
+    - Pallavi
+    - Rashmi
+  paraphrase: Nandini, have you come to our Whitefield branch in the past?
+  meaning_change: Have you never visited the Whitefield branch before, Nandini?
+- id: en-142
+  domain: appointments
+  text: Sorry, Doctor Kapoor is on leave until 18 February.
+  slots:
+  - span: 18 February
+    kind: date
+    alts:
+    - 22 February
+    - 10 February
+    - 3 March
+  paraphrase: I apologise, but Doctor Kapoor will be away on leave till 18 February.
+  meaning_change: Sorry, Doctor Kapoor is not on leave until 18 February.
+- id: en-144
+  domain: appointments
+  text: Your haircut with Zoya is confirmed, see you soon!
+  slots:
+  - span: Zoya
+    kind: name
+    alts:
+    - Alia
+    - Tara
+    - Mira
+  paraphrase: See you soon, the haircut with Zoya is all confirmed!
+  meaning_change: Your haircut with Zoya is cancelled, see you soon!
+- id: en-145
+  domain: appointments
+  text: Can you come in 20 minutes earlier to fill in the forms?
+  slots:
+  - span: '20'
+    kind: number
+    alts:
+    - '15'
+    - '30'
+    - '10'
+  paraphrase: Would it be possible for you to arrive 20 minutes early to complete the paperwork?
+  meaning_change: Can you come in 20 minutes later to fill in the forms?
+- id: en-146
+  domain: appointments
+  text: The earliest available slot with the dermatologist is on 6 April.
+  slots:
+  - span: 6 April
+    kind: date
+    alts:
+    - 9 April
+    - 2 April
+    - 13 April
+  paraphrase: Our dermatologist's first free slot falls on 6 April.
+  meaning_change: The latest available slot with the dermatologist is on 6 April.
+- id: en-148
+  domain: appointments
+  text: Will you be attending the physiotherapy session on Wednesday yourself?
+  slots:
+  - span: Wednesday
+    kind: date
+    alts:
+    - Tuesday
+    - Thursday
+    - Friday
+  paraphrase: Are you going to come for the Wednesday physiotherapy session in person?
+  meaning_change: Will you be skipping the physiotherapy session on Wednesday yourself?
+- id: en-149
+  domain: appointments
+  text: A cancellation within 24 hours of the slot will cost ₹300.
+  slots:
+  - span: ₹300
+    kind: amount
+    alts:
+    - ₹250
+    - ₹400
+    - ₹500
+  paraphrase: If you cancel less than 24 hours before the slot, you will be charged ₹300.
+  meaning_change: A cancellation within 24 hours of the slot will not cost ₹300.
+- id: en-152
+  domain: appointments
+  text: Should I book the same time with Doctor Pillai for next week?
+  slots:
+  - span: Pillai
+    kind: name
+    alts:
+    - Nambiar
+    - Iyengar
+    - Hegde
+  paraphrase: Would you like me to reserve the same slot next week with Doctor Pillai?
+  meaning_change: Should I cancel the same time with Doctor Pillai for next week?
+- id: en-153
+  domain: appointments
+  text: Visiting hours for the ward end at 7 pm sharp.
+  slots:
+  - span: 7 pm
+    kind: date
+    alts:
+    - 6 pm
+    - 8 pm
+    - 5 pm
+  paraphrase: Patients in the ward can have visitors only until exactly 7 pm.
+  meaning_change: Visiting hours for the ward start at 7 pm sharp.
+- id: en-154
+  domain: appointments
+  text: Your passport appointment at the Seva Kendra is on 14 October.
+  slots:
+  - span: 14 October
+    kind: date
+    alts:
+    - 17 October
+    - 8 October
+    - 21 October
+  paraphrase: You are booked for 14 October at the Seva Kendra for your passport.
+  meaning_change: Your passport appointment at the Seva Kendra is not on 14 October.
+- id: en-155
+  domain: appointments
+  text: Please bring all 5 original documents, since photocopies will not be accepted.
+  slots:
+  - span: '5'
+    kind: number
+    alts:
+    - '4'
+    - '6'
+    - '3'
+  paraphrase: Kindly carry the 5 originals with you, because we cannot accept photocopies.
+  meaning_change: Please bring all 5 original documents, since photocopies will be accepted.
+- id: en-156
+  domain: appointments
+  text: Would you like a reminder call on Sunday evening, or is an SMS enough?
+  slots:
+  - span: Sunday
+    kind: date
+    alts:
+    - Saturday
+    - Monday
+    - Friday
+  paraphrase: Is an SMS fine, or shall we call you on Sunday evening to remind you?
+  meaning_change: Would you dislike a reminder call on Sunday evening, or is an SMS enough?
+- id: en-157
+  domain: appointments
+  text: I am sorry, we are fully booked for the whole of May.
+  slots:
+  - span: May
+    kind: date
+    alts:
+    - June
+    - April
+    - July
+  paraphrase: Apologies, but every slot in May has already been taken.
+  meaning_change: Good news, we have free slots for the whole of May.
+- id: en-158
+  domain: appointments
+  text: Your second vaccine dose is due 28 days after the first one.
+  slots:
+  - span: '28'
+    kind: number
+    alts:
+    - '21'
+    - '30'
+    - '14'
+  paraphrase: You should get the second dose of the vaccine 28 days following the first.
+  meaning_change: Your second vaccine dose is due 28 days before the first one.
+- id: en-159
+  domain: appointments
+  text: Has Doctor Bhatt already seen your scan reports?
+  slots:
+  - span: Bhatt
+    kind: name
+    alts:
+    - Trivedi
+    - Pandya
+    - Vyas
+  paraphrase: Did Doctor Bhatt get a chance to look at your scan reports yet?
+  meaning_change: Has Doctor Bhatt not yet seen your scan reports?
+- id: en-160
+  domain: appointments
+  text: The salon offers 15 percent off on weekday bookings!
+  slots:
+  - span: '15'
+    kind: number
+    alts:
+    - '10'
+    - '20'
+    - '25'
+  paraphrase: If you book on a weekday, the salon gives you 15 percent off!
+  meaning_change: The salon charges 15 percent extra on weekday bookings!
+- id: en-161
+  domain: appointments
+  text: Your interview slot at the visa centre is 9 am on 11 March.
+  slots:
+  - span: 11 March
+    kind: date
+    alts:
+    - 12 March
+    - 18 March
+    - 4 March
+  paraphrase: At the visa centre, you are scheduled for an interview on 11 March at 9 am.
+  meaning_change: Your interview slot at the visa centre is not 9 am on 11 March.
+- id: en-163
+  domain: appointments
+  text: Is the appointment under the name Joseph Mathew?
+  slots:
+  - span: Joseph Mathew
+    kind: name
+    alts:
+    - Thomas Varghese
+    - George Kurian
+    - Paul Abraham
+  paraphrase: Has the appointment been booked in the name of Joseph Mathew?
+  meaning_change: Is the appointment not under the name Joseph Mathew?
+- id: en-164
+  domain: appointments
+  text: There is free parking for patients behind the main building for 2 hours.
+  slots:
+  - span: '2'
+    kind: number
+    alts:
+    - '3'
+    - '1'
+    - '4'
+  paraphrase: Patients can park at no cost for 2 hours in the lot behind the main building.
+  meaning_change: There is paid parking for patients behind the main building for 2 hours.
+- id: en-165
+  domain: appointments
+  text: Your follow-up with the cardiologist is due in 6 weeks.
+  slots:
+  - span: '6'
+    kind: number
+    alts:
+    - '4'
+    - '8'
+    - '12'
+  paraphrase: You should see the cardiologist again for a follow-up in 6 weeks.
+  meaning_change: Your follow-up with the cardiologist is not due in 6 weeks.
+- id: en-166
+  domain: appointments
+  text: Do you need wheelchair assistance when you arrive on Tuesday?
+  slots:
+  - span: Tuesday
+    kind: date
+    alts:
+    - Monday
+    - Wednesday
+    - Thursday
+  paraphrase: Will you require a wheelchair to help you when you come in on Tuesday?
+  meaning_change: Do you refuse wheelchair assistance when you arrive on Tuesday?
+- id: en-167
+  domain: appointments
+  text: Perfect, your table for 4 is booked at 8 pm!
+  slots:
+  - span: '4'
+    kind: number
+    alts:
+    - '2'
+    - '6'
+    - '5'
+  paraphrase: All done, we have reserved a table for 4 at 8 pm!
+  meaning_change: Sorry, your table for 4 is not booked at 8 pm!
+- id: en-168
+  domain: appointments
+  text: The MRI scan takes about 45 minutes, so please plan accordingly.
+  slots:
+  - span: '45'
+    kind: number
+    alts:
+    - '30'
+    - '60'
+    - '40'
+  paraphrase: Please plan your day keeping in mind that the MRI scan lasts around 45 minutes.
+  meaning_change: The MRI scan takes more than 45 minutes, so please plan accordingly.
+- id: en-170
+  domain: appointments
+  text: Would you like to bring your appointment forward to 9 July?
+  slots:
+  - span: 9 July
+    kind: date
+    alts:
+    - 12 July
+    - 5 July
+    - 16 July
+  paraphrase: Shall we move your appointment earlier, to 9 July?
+  meaning_change: Would you like to push your appointment back to 9 July?

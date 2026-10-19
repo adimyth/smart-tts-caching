@@ -1,0 +1,64 @@
+[project]
+name = "smart-tts-caching"
+version = "0.0.0"
+description = "Development workspace for tts-cache and tts-cache-pipecat"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "tts-cache[redis,cli,similarity]",
+    "tts-cache-pipecat",
+    # The harness drives these services against the live APIs.
+    "pipecat-ai[openai,elevenlabs,sarvam]",
+    "python-dotenv>=1",
+    "aiohttp>=3.14",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+    "hypothesis>=6",
+    "pyyaml>=6",
+    "ruff>=0.6",
+    "pyright>=1.1.380",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/tts-cache", "packages/tts-cache-pipecat"]
+
+[tool.uv.sources]
+tts-cache = { workspace = true }
+tts-cache-pipecat = { workspace = true }
+# The pinned Pipecat: an editable checkout at commit 1d1385b6d (1.12.1.dev500).
+pipecat-ai = { path = "../pipecat", editable = true }
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["harness"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "ASYNC", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tts_cache", "tts_cache_pipecat"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+pythonVersion = "3.12"
+include = ["packages/tts-cache/src", "packages/tts-cache-pipecat/src"]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["packages/tts-cache/tests", "packages/tts-cache-pipecat/tests"]
+markers = [
+    "redis: needs the dedicated Redis named by TTS_CACHE_REDIS_URL",
+    "slow: longer-running simulations",
+]
+addopts = "--import-mode=importlib"

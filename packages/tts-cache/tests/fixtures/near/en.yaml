@@ -1,0 +1,47 @@
+# a: the sentence looked up; b: the stored sentence; class: the expected Level B diff class.
+# Section 5 examples: "Sure, let me explain." vs "Sure, let me explain that."; "Thanks, Alex." vs "Thanks, Sam."; "Okay." vs "Okay, okay."
+- {a: "Sure, let me check that.", b: "Sure let me check that.", class: punctuation}
+- {a: "Hello, how can I help you today?", b: "Hello how can I help you today?", class: punctuation}
+- {a: "Thank you; we'll call you back.", b: "Thank you, we'll call you back.", class: punctuation}
+- {a: "Great, see you then!", b: "Great, see you then.", class: punctuation}
+- {a: "Is that right?", b: "Is that right!", class: punctuation}
+- {a: "Okay - one moment please.", b: "Okay, one moment please.", class: punctuation}
+- {a: "Please hold, I'm checking.", b: "Please hold. I'm checking.", class: punctuation}
+- {a: "Your order, which you placed yesterday, has shipped.", b: "Your order which you placed yesterday has shipped.", class: punctuation}
+- {a: "Right, so, let's begin.", b: "Right so let's begin.", class: punctuation}
+- {a: "Thanks for waiting...", b: "Thanks for waiting!", class: punctuation}
+- {a: "Okay, let me check that for you.", b: "Let me check that for you.", class: filler}
+- {a: "So, your order has shipped.", b: "Your order has shipped.", class: filler}
+- {a: "Well, I can help you with that.", b: "I can help you with that.", class: filler}
+- {a: "Okay.", b: "Okay, okay.", class: filler}
+- {a: "Um, could you repeat that?", b: "Could you repeat that?", class: filler}
+- {a: "Alright, your refund is processed.", b: "Your refund is processed.", class: filler}
+- {a: "Your booking is confirmed, okay.", b: "Your booking is confirmed.", class: filler}
+- {a: "Actually, the store opens at nine.", b: "The store opens at nine.", class: filler}
+- {a: "Sure, I can do that.", b: "I can do that.", class: filler}
+- {a: "Yeah, that works for me.", b: "That works for me.", class: filler}
+- {a: "All right, let's get started.", b: "Let's get started.", class: filler}
+- {a: "Oh, I see the problem now.", b: "I see the problem now.", class: filler}
+- {a: "Thanks, Alex.", b: "Thanks, Sam.", class: slot}
+- {a: "Your order 4521 has shipped.", b: "Your order 7710 has shipped.", class: slot}
+- {a: "Your appointment is on Monday.", b: "Your appointment is on Tuesday.", class: slot}
+- {a: "The total comes to $25.", b: "The total comes to $40.", class: slot}
+- {a: "Your refund of 500 rupees is on its way.", b: "Your refund of 800 rupees is on its way.", class: slot}
+- {a: "Hi Priya, how are you today?", b: "Hi Neha, how are you today?", class: slot}
+- {a: "Your delivery is scheduled for March.", b: "Your delivery is scheduled for April.", class: slot}
+- {a: "Please call back at 3 pm.", b: "Please call back at 5 pm.", class: slot}
+- {a: "Your plan renews on 12 May.", b: "Your plan renews on 19 May.", class: slot}
+- {a: "I have sent the code to your Gmail.", b: "I have sent the code to your Outlook.", class: slot}
+- {a: "Your balance is 1200 dollars.", b: "Your balance is 1200 euros.", class: slot}
+- {a: "The technician Ravi will visit today.", b: "The technician Kumar will visit today.", class: slot}
+- {a: "Your ticket number is 88213.", b: "Your ticket number is 88231.", class: slot}
+- {a: "Thanks for calling.", b: "Thanks for calling Acme.", class: slot}
+- {a: "Sure, let me explain.", b: "Sure, let me explain that.", class: other}
+- {a: "Your order has shipped.", b: "Your order has been cancelled.", class: other}
+- {a: "I can help you with that.", b: "I cannot help you with that.", class: other}
+- {a: "Please hold the line.", b: "Please leave the line.", class: other}
+- {a: "Your payment failed.", b: "Your payment went through.", class: other}
+- {a: "Let me check.", b: "Let me check your account history.", class: other}
+- {a: "We will call you back soon.", b: "We will email you back soon.", class: other}
+- {a: "Is there anything else?", b: "Is there anything else I can do?", class: other}
+- {a: "Your order is ready for pickup.", b: "Your order is not ready for pickup.", class: other}

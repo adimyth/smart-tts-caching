@@ -1,0 +1,51 @@
+# input -> expected canonical form, English. Pairs that must share a key share an expected value.
+- {in: "Hello, and thank you for calling.", out: "hello, and thank you for calling"}
+- {in: "  Hello,   and thank you for calling.  ", out: "hello, and thank you for calling"}
+- {in: "Hello, and thank you for calling!", out: "hello, and thank you for calling!"}
+- {in: "Hello, and thank you for calling!!", out: "hello, and thank you for calling!"}
+- {in: "Is that right?", out: "is that right?"}
+- {in: "Is that right??", out: "is that right?"}
+- {in: "Is that right ?", out: "is that right?"}
+# SOLUTION.md 11.3: markdown that reaches the provider unfiltered keys like plain text.
+- {in: "**Thanks**, Alex.", out: "thanks, alex"}
+- {in: "Thanks, Alex.", out: "thanks, alex"}
+- {in: "Thanks , Alex .", out: "thanks, alex"}
+- {in: "Thanks, Alex", out: "thanks, alex"}
+- {in: "Thanks, Alex,", out: "thanks, alex,"}
+- {in: "It costs ₹500.", out: "it costs ₹500"}
+- {in: "Your code is ٤٥٦.", out: "your code is 456"}
+- {in: "Your code is １２３.", out: "your code is 123"}
+- {in: "The total is $29.95.", out: "the total is $29.95"}
+- {in: "Call 1-800-555-0199.", out: "call 1-800-555-0199"}
+- {in: "OK.", out: "OK"}
+- {in: "Ok.", out: "ok"}
+- {in: "PLEASE HOLD.", out: "PLEASE HOLD"}
+- {in: "Please hold.", out: "please hold"}
+- {in: "THANK YOU, Alex.", out: "thank you, alex"}
+- {in: "I see.", out: "i see"}
+- {in: "“Great,” she said.", out: "\"great,\" she said"}
+- {in: "\"Great,\" she said.", out: "\"great,\" she said"}
+- {in: "It’s fine.", out: "it's fine"}
+- {in: "It's fine.", out: "it's fine"}
+- {in: "Wait — what?", out: "wait - what?"}
+- {in: "Wait – what?", out: "wait - what?"}
+- {in: "Wait - what?", out: "wait - what?"}
+- {in: "Great! 🎉", out: "great!"}
+- {in: "Great 🎉!", out: "great!"}
+- {in: "Great! 🎉!", out: "great!"}
+- {in: "Done ✅.", out: "done"}
+- {in: "Click [here](https://example.com) to continue.", out: "click here to continue"}
+- {in: "# Welcome back.", out: "welcome back"}
+- {in: "> Welcome back.", out: "welcome back"}
+- {in: "Use `pip install` now.", out: "use pip install now"}
+- {in: "_Really_ sure.", out: "really sure"}
+- {in: "snake_case is fine.", out: "snake_case is fine"}
+- {in: "Hello\nthere.", out: "hello there"}
+- {in: "Hello there.", out: "hello there"}
+- {in: "Hel​lo.", out: "hello"}
+- {in: "Café.", out: "café"}
+- {in: "Café.", out: "café"}
+- {in: "Wait...", out: "wait"}
+- {in: "Wait…", out: "wait…"}
+- {in: "Yes. .", out: "yes"}
+- {in: "Hi!!!  How are you?", out: "hi! how are you?"}

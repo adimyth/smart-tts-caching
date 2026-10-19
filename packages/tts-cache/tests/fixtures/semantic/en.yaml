@@ -1,0 +1,200 @@
+- {a: "I am sorry for the inconvenience this has caused you.", b: "I apologise for the trouble this has caused you.", label: paraphrase}
+- {a: "Please hold the line while I check your details.", b: "Kindly stay on the line while I look up your details.", label: paraphrase}
+- {a: "Is there anything else I can help you with today?", b: "Can I assist you with anything else today?", label: paraphrase}
+- {a: "Thank you for calling, have a wonderful day.", b: "Thanks for your call, and have a wonderful day.", label: paraphrase}
+- {a: "I have raised a complaint on your behalf and our team will contact you soon.", b: "A complaint has been raised on your behalf, and our team will get in touch with you soon.", label: paraphrase}
+- {a: "Could you please repeat that once more?", b: "Would you mind saying that one more time?", label: paraphrase}
+- {a: "I could not hear you clearly, could you speak a little louder?", b: "I did not catch that clearly, would you please speak a bit louder?", label: paraphrase}
+- {a: "Your ticket has been escalated to our senior support team.", b: "We have escalated your ticket to our senior support team.", label: paraphrase}
+- {a: "I am transferring your call to a specialist now.", b: "I am now connecting you to a specialist.", label: paraphrase}
+- {a: "Please stay on the line, your call is important to us.", b: "Your call matters to us, so please do not hang up.", label: paraphrase}
+- {a: "Your current account balance is ₹12,450.", b: "The current balance in your account is ₹12,450.", label: paraphrase}
+- {a: "Your debit card has been blocked as requested.", b: "As you asked, we have blocked your debit card.", label: paraphrase}
+- {a: "A new card will be sent to your registered address within seven working days.", b: "We will send a new card to your registered address within seven working days.", label: paraphrase}
+- {a: "Please do not share your OTP with anyone, including bank staff.", b: "Never share your OTP with anyone, not even bank employees.", label: paraphrase}
+- {a: "Your EMI of ₹4,200 is due on the 5th of every month.", b: "Your ₹4,200 EMI falls due on the 5th of each month.", label: paraphrase}
+- {a: "I have successfully updated your registered mobile number.", b: "Your registered mobile number has been updated successfully.", label: paraphrase}
+- {a: "The transfer to Rahul Verma has been completed.", b: "Your transfer to Rahul Verma went through successfully.", label: paraphrase}
+- {a: "Your fixed deposit will mature on 14 March.", b: "On 14 March, your fixed deposit reaches maturity.", label: paraphrase}
+- {a: "I can see a payment of ₹2,500 pending on your credit card.", b: "There is a pending payment of ₹2,500 on your credit card.", label: paraphrase}
+- {a: "Your cheque book request has been placed and will be dispatched shortly.", b: "We have placed your request for a cheque book, and it will be sent out shortly.", label: paraphrase}
+- {a: "For security reasons, I need to verify your date of birth.", b: "I need to confirm your date of birth for security purposes.", label: paraphrase}
+- {a: "Your loan application is currently under review.", b: "We are currently reviewing your loan application.", label: paraphrase}
+- {a: "Your package is out for delivery and should reach you by evening.", b: "Your parcel is out for delivery and ought to arrive by this evening.", label: paraphrase}
+- {a: "Our delivery partner Arjun will call you before arriving.", b: "Arjun, our delivery partner, will give you a call before he arrives.", label: paraphrase}
+- {a: "We were unable to deliver your order because no one was at home.", b: "Your order could not be delivered since nobody was home.", label: paraphrase}
+- {a: "Would you like us to leave the parcel with your neighbour?", b: "Shall we hand the parcel over to your neighbour?", label: paraphrase}
+- {a: "Your order number 48213 has been shipped.", b: "We have shipped your order number 48213.", label: paraphrase}
+- {a: "The delivery has been rescheduled to Thursday.", b: "We have moved the delivery to Thursday.", label: paraphrase}
+- {a: "Please keep the exact change ready for cash on delivery.", b: "Kindly have the exact amount in cash ready when your order is delivered.", label: paraphrase}
+- {a: "Your return pickup is scheduled for tomorrow between 10 am and 2 pm.", b: "We will pick up your return tomorrow between 10 am and 2 pm.", label: paraphrase}
+- {a: "You can track your order using the link we sent by SMS.", b: "The link we sent you by SMS lets you track your order.", label: paraphrase}
+- {a: "Your food will be delivered in about 25 minutes.", b: "Your food should reach you in roughly 25 minutes.", label: paraphrase}
+- {a: "Your appointment with Doctor Mehta is confirmed for Friday at 11 am.", b: "We have confirmed your Friday 11 am appointment with Doctor Mehta.", label: paraphrase}
+- {a: "Would you like to book the next available slot?", b: "Shall I reserve the next free slot for you?", label: paraphrase}
+- {a: "Please arrive fifteen minutes before your scheduled time.", b: "Kindly come in fifteen minutes ahead of your appointment time.", label: paraphrase}
+- {a: "Your appointment has been cancelled and no fee will be charged.", b: "We have cancelled your appointment, and you will not be charged any fee.", label: paraphrase}
+- {a: "I have rescheduled your visit to Wednesday at 4 pm.", b: "Your visit has been moved to Wednesday at 4 pm.", label: paraphrase}
+- {a: "The clinic is closed on Sundays and public holidays.", b: "On Sundays and public holidays, the clinic stays closed.", label: paraphrase}
+- {a: "You will receive a reminder message one day before your appointment.", b: "We will send you a reminder message a day ahead of your appointment.", label: paraphrase}
+- {a: "Do you prefer a morning or an afternoon appointment?", b: "Would a morning or an afternoon appointment suit you better?", label: paraphrase}
+- {a: "Please bring your previous prescriptions and test reports with you.", b: "Kindly carry your earlier prescriptions and test reports along.", label: paraphrase}
+- {a: "Your session with Ananya has been booked for Saturday.", b: "I have booked your session with Ananya for Saturday.", label: paraphrase}
+- {a: "Your data pack of 2 GB per day has been activated.", b: "We have activated your 2 GB per day data pack.", label: paraphrase}
+- {a: "Your current plan will expire in three days.", b: "Your present plan expires in three days.", label: paraphrase}
+- {a: "We are facing a network outage in your area and are working to fix it.", b: "There is a network outage in your area, and we are working on a fix.", label: paraphrase}
+- {a: "Your bill of ₹899 is due on 20 June.", b: "The ₹899 bill on your account is due on 20 June.", label: paraphrase}
+- {a: "To recharge, please reply with the plan amount you would like.", b: "Please reply with the plan amount you want in order to recharge.", label: paraphrase}
+- {a: "International roaming is now active on your number.", b: "Your number now has international roaming activated.", label: paraphrase}
+- {a: "Your SIM will be activated within the next four hours.", b: "Your SIM will get activated in four hours or less.", label: paraphrase}
+- {a: "I have restarted your broadband connection remotely.", b: "I have remotely rebooted your broadband connection.", label: paraphrase}
+- {a: "A technician will visit your home tomorrow to check the line.", b: "Tomorrow, a technician will come to your home to inspect the line.", label: paraphrase}
+- {a: "You have used 80 percent of your monthly data.", b: "80 percent of your monthly data has been used.", label: paraphrase}
+- {a: "Your claim has been approved and the amount will be credited within five days.", b: "We have approved your claim, and the money will reach your account within five days.", label: paraphrase}
+- {a: "Your policy premium of ₹15,000 is due next week.", b: "Next week, your policy premium of ₹15,000 becomes due.", label: paraphrase}
+- {a: "Please upload the hospital bills to process your claim faster.", b: "Uploading the hospital bills will help us process your claim faster.", label: paraphrase}
+- {a: "Your vehicle insurance policy has been renewed successfully.", b: "We have successfully renewed your vehicle insurance policy.", label: paraphrase}
+- {a: "A surveyor will inspect your car within 48 hours.", b: "Within 48 hours, a surveyor will come to inspect your car.", label: paraphrase}
+- {a: "Your nominee details have been updated to Kavita Sharma.", b: "We have changed your nominee details to Kavita Sharma.", label: paraphrase}
+- {a: "This policy does not cover pre-existing illnesses for the first two years.", b: "For the first two years, pre-existing illnesses are not covered under this policy.", label: paraphrase}
+- {a: "Can you tell me the date when the incident happened?", b: "Could you let me know on which date the incident took place?", label: paraphrase}
+- {a: "I understand your concern and I will help you resolve it.", b: "I get your concern, and I will help you sort it out.", label: paraphrase}
+- {a: "Let me quickly check that for you.", b: "Give me a moment to check that for you.", label: paraphrase}
+- {a: "Your request has been noted and will be processed within 24 hours.", b: "We have noted your request and will process it within 24 hours.", label: paraphrase}
+- {a: "You will get a confirmation message shortly.", b: "A confirmation message will be sent to you shortly.", label: paraphrase}
+- {a: "Can you please confirm your registered email address?", b: "Could you confirm the email address registered with us?", label: paraphrase}
+- {a: "I am unable to find any account linked to this number.", b: "There is no account linked to this number that I can find.", label: paraphrase}
+- {a: "Your refund of ₹1,299 has been initiated.", b: "We have started processing your refund of ₹1,299.", label: paraphrase}
+- {a: "The refund should reflect in your account within 5 to 7 working days.", b: "Within 5 to 7 working days, you should see the refund in your account.", label: paraphrase}
+- {a: "It's a pleasure speaking with you, Rohan.", b: "It is a pleasure talking to you, Rohan.", label: paraphrase}
+- {a: "I don't see any pending dues on your account.", b: "I do not see any outstanding dues on your account.", label: paraphrase}
+- {a: "We're sorry, but this offer is no longer available.", b: "We are sorry, but this offer is not available anymore.", label: paraphrase}
+- {a: "Please say yes to confirm or no to cancel.", b: "To confirm, say yes, and to cancel, say no.", label: paraphrase}
+- {a: "Your feedback helps us improve our service.", b: "We improve our service with the help of your feedback.", label: paraphrase}
+- {a: "Your order of two large pizzas has been placed.", b: "We have placed your order for two large pizzas.", label: paraphrase}
+- {a: "The replacement for your Samsung Galaxy phone has been approved.", b: "We have approved a replacement for your Samsung Galaxy phone.", label: paraphrase}
+- {a: "Our store opens at 9 am and closes at 9 pm.", b: "Our store is open from 9 am until 9 pm.", label: paraphrase}
+- {a: "Your password reset link has been sent to your email.", b: "We have emailed you a link to reset your password.", label: paraphrase}
+- {a: "You are eligible for a credit limit increase.", b: "You qualify for an increase in your credit limit.", label: paraphrase}
+- {a: "Hello Neha, I am calling from your bank about a recent transaction.", b: "Hi Neha, this call is from your bank regarding a recent transaction.", label: paraphrase}
+- {a: "Could you please tell me your order number?", b: "May I have your order number, please?", label: paraphrase}
+- {a: "I will send you the details on WhatsApp right away.", b: "I am sending the details to you on WhatsApp immediately.", label: paraphrase}
+- {a: "The courier will collect the item from your doorstep.", b: "The item will be picked up from your doorstep by the courier.", label: paraphrase}
+- {a: "Your gas cylinder booking has been confirmed for Tuesday.", b: "We have confirmed your gas cylinder booking for Tuesday.", label: paraphrase}
+- {a: "Your cashback of ₹150 will be credited to your wallet.", b: "We will credit ₹150 cashback into your wallet.", label: paraphrase}
+- {a: "Sorry to keep you waiting, thank you for your patience.", b: "Apologies for the wait, and thanks for being patient.", label: paraphrase}
+- {a: "Your call may be recorded for quality and training purposes.", b: "For quality and training purposes, this call may be recorded.", label: paraphrase}
+- {a: "You can also visit our nearest branch for further help.", b: "For more help, you may also go to our nearest branch.", label: paraphrase}
+- {a: "Unfortunately, the item you ordered is out of stock.", b: "I am afraid the item you ordered is not in stock right now.", label: paraphrase}
+- {a: "Your KYC verification has been completed successfully.", b: "We have successfully completed your KYC verification.", label: paraphrase}
+- {a: "Please keep your policy number handy before calling us again.", b: "Before you call us again, please keep your policy number ready.", label: paraphrase}
+- {a: "Would you like to hear your last five transactions?", b: "Do you want me to read out your last five transactions?", label: paraphrase}
+- {a: "Your complaint number is 77812, please note it for future reference.", b: "Please note down your complaint number 77812 for future reference.", label: paraphrase}
+- {a: "The service charge for this request is ₹50 plus taxes.", b: "This request carries a service charge of ₹50 plus taxes.", label: paraphrase}
+- {a: "We have received your payment, thank you.", b: "Thank you, your payment has reached us.", label: paraphrase}
+- {a: "Your connection will be restored once the payment is received.", b: "Once we receive the payment, your connection will be restored.", label: paraphrase}
+- {a: "Your booking reference has been sent to your registered mobile number.", b: "We have sent the booking reference to your registered mobile number.", label: paraphrase}
+- {a: "This call is about your upcoming insurance renewal on 1 August.", b: "I am calling regarding your insurance renewal coming up on 1 August.", label: paraphrase}
+- {a: "Is this a good time to talk for a couple of minutes?", b: "Do you have a couple of minutes to talk right now?", label: paraphrase}
+- {a: "Your order cannot be cancelled as it has already been dispatched.", b: "Since your order has already been dispatched, it cannot be cancelled.", label: paraphrase}
+- {a: "I have added a note to your account so the next agent can see it.", b: "A note has been added to your account so that the next agent can view it.", label: paraphrase}
+- {a: "Your appointment with Doctor Iyer is confirmed for tomorrow morning.", b: "Your appointment with Doctor Rao is confirmed for tomorrow morning.", label: near_miss, slot: name}
+- {a: "I have transferred ₹3,000 to Sanjay as you requested.", b: "I have transferred ₹3,000 to Vikram as you requested.", label: near_miss, slot: name}
+- {a: "Hello Priya, I am calling about your recent order.", b: "Hello Meera, I am calling about your recent order.", label: near_miss, slot: name}
+- {a: "Your delivery executive Ramesh is on the way to your location.", b: "Your delivery executive Suresh is on the way to your location.", label: near_miss, slot: name}
+- {a: "The nominee on your policy is listed as Anjali Kapoor.", b: "The nominee on your policy is listed as Anjali Malhotra.", label: near_miss, slot: name}
+- {a: "I am connecting you to our senior advisor Farhan now.", b: "I am connecting you to our senior advisor Imran now.", label: near_miss, slot: name}
+- {a: "Your session with physiotherapist Lakshmi is booked for the afternoon.", b: "Your session with physiotherapist Divya is booked for the afternoon.", label: near_miss, slot: name}
+- {a: "Am I speaking with Amit, the registered account holder?", b: "Am I speaking with Rohit, the registered account holder?", label: near_miss, slot: name}
+- {a: "The parcel was received at the door by Kiran.", b: "The parcel was received at the door by Pooja.", label: near_miss, slot: name}
+- {a: "Your beneficiary Deepak has been added successfully.", b: "Your beneficiary Manoj has been added successfully.", label: near_miss, slot: name}
+- {a: "Your claim is being handled by our agent Shalini.", b: "Your claim is being handled by our agent Rekha.", label: near_miss, slot: name}
+- {a: "I have scheduled a call back from our manager Gaurav this evening.", b: "I have scheduled a call back from our manager Nikhil this evening.", label: near_miss, slot: name}
+- {a: "The joint account holder listed here is Sunita Rao.", b: "The joint account holder listed here is Sunita Nair.", label: near_miss, slot: name}
+- {a: "Your technician Arvind will reach between 2 pm and 4 pm.", b: "Your technician Harish will reach between 2 pm and 4 pm.", label: near_miss, slot: name}
+- {a: "This order was placed by Aditi from your family account.", b: "This order was placed by Swati from your family account.", label: near_miss, slot: name}
+- {a: "Your table for four is booked under the name Mehra.", b: "Your table for four is booked under the name Khanna.", label: near_miss, slot: name}
+- {a: "Doctor Banerjee has a free slot on Thursday afternoon.", b: "Doctor Chatterjee has a free slot on Thursday afternoon.", label: near_miss, slot: name}
+- {a: "The gift card was sent to Ishaan at his registered email.", b: "The gift card was sent to Kabir at his registered email.", label: near_miss, slot: name}
+- {a: "Your rent payment to landlord Prakash has been scheduled.", b: "Your rent payment to landlord Mohan has been scheduled.", label: near_miss, slot: name}
+- {a: "Your relationship manager Tanvi will call you tomorrow.", b: "Your relationship manager Shreya will call you tomorrow.", label: near_miss, slot: name}
+- {a: "The car insured under this policy belongs to Rajesh Gupta.", b: "The car insured under this policy belongs to Rajesh Agarwal.", label: near_miss, slot: name}
+- {a: "I see that Varun is the authorised user on this card.", b: "I see that Akash is the authorised user on this card.", label: near_miss, slot: name}
+- {a: "Your bill split request was accepted by Nandini.", b: "Your bill split request was accepted by Ritu.", label: near_miss, slot: name}
+- {a: "Our pharmacist Joseph will confirm your prescription shortly.", b: "Our pharmacist Thomas will confirm your prescription shortly.", label: near_miss, slot: name}
+- {a: "The SIM replacement is registered in the name of Fatima Sheikh.", b: "The SIM replacement is registered in the name of Zainab Sheikh.", label: near_miss, slot: name}
+- {a: "Your order number 58321 has been dispatched from our warehouse.", b: "Your order number 58327 has been dispatched from our warehouse.", label: near_miss, slot: number}
+- {a: "Your one time password is 739204 and it is valid for ten minutes.", b: "Your one time password is 739284 and it is valid for ten minutes.", label: near_miss, slot: number}
+- {a: "You have 3 unread messages from our support team.", b: "You have 5 unread messages from our support team.", label: near_miss, slot: number}
+- {a: "We are offering a 10 percent discount on your next recharge.", b: "We are offering a 15 percent discount on your next recharge.", label: near_miss, slot: number}
+- {a: "Your complaint has been registered with reference number 66104.", b: "Your complaint has been registered with reference number 66140.", label: near_miss, slot: number}
+- {a: "There are 2 items in your cart waiting for checkout.", b: "There are 4 items in your cart waiting for checkout.", label: near_miss, slot: number}
+- {a: "You have used 75 percent of your monthly data allowance.", b: "You have used 95 percent of your monthly data allowance.", label: near_miss, slot: number}
+- {a: "Your interest rate on this loan is 9 percent per year.", b: "Your interest rate on this loan is 11 percent per year.", label: near_miss, slot: number}
+- {a: "Please press 1 to speak with a customer care executive.", b: "Please press 2 to speak with a customer care executive.", label: near_miss, slot: number}
+- {a: "Your ticket number for this issue is 30917.", b: "Your ticket number for this issue is 30971.", label: near_miss, slot: number}
+- {a: "We found 4 failed login attempts on your account today.", b: "We found 6 failed login attempts on your account today.", label: near_miss, slot: number}
+- {a: "Your policy number ending in 4417 has been renewed.", b: "Your policy number ending in 4471 has been renewed.", label: near_miss, slot: number}
+- {a: "Your shipment contains 12 boxes and will arrive together.", b: "Your shipment contains 10 boxes and will arrive together.", label: near_miss, slot: number}
+- {a: "Your reward balance is 1,250 points as of today.", b: "Your reward balance is 1,520 points as of today.", label: near_miss, slot: number}
+- {a: "Your verification code is 5512, valid for the next five minutes.", b: "Your verification code is 5521, valid for the next five minutes.", label: near_miss, slot: number}
+- {a: "You can redeem up to 3 vouchers on a single order.", b: "You can redeem up to 2 vouchers on a single order.", label: near_miss, slot: number}
+- {a: "Your flat number on record is 402 in Tower B.", b: "Your flat number on record is 204 in Tower B.", label: near_miss, slot: number}
+- {a: "Your parcel tracking number is 778100345526.", b: "Your parcel tracking number is 778100345562.", label: near_miss, slot: number}
+- {a: "There are 6 people ahead of you in the queue.", b: "There are 8 people ahead of you in the queue.", label: near_miss, slot: number}
+- {a: "Your policy shows a 20 percent no claim bonus on renewal.", b: "Your policy shows a 25 percent no claim bonus on renewal.", label: near_miss, slot: number}
+- {a: "Your card ending with 8842 was used for an online purchase.", b: "Your card ending with 8824 was used for an online purchase.", label: near_miss, slot: number}
+- {a: "We have reserved 2 seats for you on the morning bus.", b: "We have reserved 3 seats for you on the morning bus.", label: near_miss, slot: number}
+- {a: "Please enter the 6 digit code sent to your phone.", b: "Please enter the 4 digit code sent to your phone.", label: near_miss, slot: number}
+- {a: "Your account has completed 18 successful auto debits so far.", b: "Your account has completed 16 successful auto debits so far.", label: near_miss, slot: number}
+- {a: "Your mobile number ending in 3390 will receive the update.", b: "Your mobile number ending in 3309 will receive the update.", label: near_miss, slot: number}
+- {a: "Your delivery is scheduled for Tuesday between 9 am and 1 pm.", b: "Your delivery is scheduled for Wednesday between 9 am and 1 pm.", label: near_miss, slot: date}
+- {a: "Your appointment with the dentist is at 3 pm today.", b: "Your appointment with the dentist is at 4 pm today.", label: near_miss, slot: date}
+- {a: "Your credit card bill is due on 15 April.", b: "Your credit card bill is due on 15 May.", label: near_miss, slot: date}
+- {a: "The technician visit has been fixed for Saturday morning.", b: "The technician visit has been fixed for Sunday morning.", label: near_miss, slot: date}
+- {a: "Your policy will lapse on 30 September if the premium is not paid.", b: "Your policy will lapse on 30 November if the premium is not paid.", label: near_miss, slot: date}
+- {a: "Our branch will remain closed on 26 January.", b: "Our branch will remain closed on 28 January.", label: near_miss, slot: date}
+- {a: "Your pickup has been moved to 11 am tomorrow.", b: "Your pickup has been moved to 10 am tomorrow.", label: near_miss, slot: date}
+- {a: "The new tariff will apply from 1 July onwards.", b: "The new tariff will apply from 1 June onwards.", label: near_miss, slot: date}
+- {a: "Your vaccination slot is booked for Monday at 10 am.", b: "Your vaccination slot is booked for Friday at 10 am.", label: near_miss, slot: date}
+- {a: "We will call you back at 6 pm this evening.", b: "We will call you back at 7 pm this evening.", label: near_miss, slot: date}
+- {a: "Your loan EMI will be deducted on the 10th of every month.", b: "Your loan EMI will be deducted on the 3rd of every month.", label: near_miss, slot: date}
+- {a: "The maintenance window is from midnight to 4 am on Sunday.", b: "The maintenance window is from midnight to 4 am on Saturday.", label: near_miss, slot: date}
+- {a: "Your fixed deposit renewal is due in December.", b: "Your fixed deposit renewal is due in October.", label: near_miss, slot: date}
+- {a: "Your consultation has been rescheduled to Thursday at noon.", b: "Your consultation has been rescheduled to Tuesday at noon.", label: near_miss, slot: date}
+- {a: "The courier attempted delivery yesterday at 2 pm.", b: "The courier attempted delivery yesterday at 5 pm.", label: near_miss, slot: date}
+- {a: "Your free trial ends on 22 March.", b: "Your free trial ends on 29 March.", label: near_miss, slot: date}
+- {a: "Your gym membership renewal date is 5 November.", b: "Your gym membership renewal date is 5 February.", label: near_miss, slot: date}
+- {a: "The doctor is available only on Wednesday afternoons.", b: "The doctor is available only on Friday afternoons.", label: near_miss, slot: date}
+- {a: "Your connection will be disconnected on 3 August due to non payment.", b: "Your connection will be disconnected on 8 August due to non payment.", label: near_miss, slot: date}
+- {a: "The claim inspection is planned for next Monday.", b: "The claim inspection is planned for next Tuesday.", label: near_miss, slot: date}
+- {a: "Your order will be ready for collection after 5 pm.", b: "Your order will be ready for collection after 7 pm.", label: near_miss, slot: date}
+- {a: "Your new SIM card will reach you by Friday.", b: "Your new SIM card will reach you by Sunday.", label: near_miss, slot: date}
+- {a: "Your statement for the month of June is now available.", b: "Your statement for the month of July is now available.", label: near_miss, slot: date}
+- {a: "Our office hours on Saturday end at 1 pm.", b: "Our office hours on Saturday end at 2 pm.", label: near_miss, slot: date}
+- {a: "Your tax saving deposit will mature on 31 March 2028.", b: "Your tax saving deposit will mature on 31 March 2029.", label: near_miss, slot: date}
+- {a: "Your refund of ₹850 has been credited to your bank account.", b: "Your refund of ₹580 has been credited to your bank account.", label: near_miss, slot: amount}
+- {a: "The outstanding amount on your credit card is ₹18,700.", b: "The outstanding amount on your credit card is ₹17,800.", label: near_miss, slot: amount}
+- {a: "Your monthly premium for this health plan is ₹1,450.", b: "Your monthly premium for this health plan is ₹1,540.", label: near_miss, slot: amount}
+- {a: "A late fee of ₹300 has been added to your bill.", b: "A late fee of ₹500 has been added to your bill.", label: near_miss, slot: amount}
+- {a: "Your recharge of ₹249 was successful.", b: "Your recharge of ₹299 was successful.", label: near_miss, slot: amount}
+- {a: "The delivery charge for this order is 40 rupees.", b: "The delivery charge for this order is 60 rupees.", label: near_miss, slot: amount}
+- {a: "Your cashback of ₹75 will be added within 24 hours.", b: "Your cashback of ₹100 will be added within 24 hours.", label: near_miss, slot: amount}
+- {a: "The minimum amount due this month is ₹2,100.", b: "The minimum amount due this month is ₹1,200.", label: near_miss, slot: amount}
+- {a: "You have been charged $19.99 for your monthly subscription.", b: "You have been charged $29.99 for your monthly subscription.", label: near_miss, slot: amount}
+- {a: "Your claim settlement amount is ₹42,000.", b: "Your claim settlement amount is ₹24,000.", label: near_miss, slot: amount}
+- {a: "The cancellation fee for this booking is ₹200.", b: "The cancellation fee for this booking is ₹250.", label: near_miss, slot: amount}
+- {a: "Your wallet balance is now ₹1,020 after the payment.", b: "Your wallet balance is now ₹1,200 after the payment.", label: near_miss, slot: amount}
+- {a: "Your pending EMI amount of ₹6,300 will be debited tomorrow.", b: "Your pending EMI amount of ₹3,600 will be debited tomorrow.", label: near_miss, slot: amount}
+- {a: "A security deposit of ₹5,000 is required for the new connection.", b: "A security deposit of ₹2,000 is required for the new connection.", label: near_miss, slot: amount}
+- {a: "Your electricity bill for this cycle comes to ₹1,875.", b: "Your electricity bill for this cycle comes to ₹1,785.", label: near_miss, slot: amount}
+- {a: "The repair estimate for your laptop is ₹3,499.", b: "The repair estimate for your laptop is ₹4,399.", label: near_miss, slot: amount}
+- {a: "You will receive a refund of 120 dollars within a week.", b: "You will receive a refund of 150 dollars within a week.", label: near_miss, slot: amount}
+- {a: "The deductible on your car insurance claim is ₹1,000.", b: "The deductible on your car insurance claim is ₹2,000.", label: near_miss, slot: amount}
+- {a: "Your transfer of ₹7,500 to the savings account is complete.", b: "Your transfer of ₹5,700 to the savings account is complete.", label: near_miss, slot: amount}
+- {a: "A convenience fee of ₹15 applies to card payments.", b: "A convenience fee of ₹25 applies to card payments.", label: near_miss, slot: amount}
+- {a: "Your total order value after discount is ₹2,349.", b: "Your total order value after discount is ₹2,439.", label: near_miss, slot: amount}
+- {a: "The annual fee of ₹499 on your card has been waived.", b: "The annual fee of ₹999 on your card has been waived.", label: near_miss, slot: amount}
+- {a: "Your overdraft limit has been set to ₹50,000.", b: "Your overdraft limit has been set to ₹25,000.", label: near_miss, slot: amount}
+- {a: "We have credited a goodwill amount of £20 to your account.", b: "We have credited a goodwill amount of £30 to your account.", label: near_miss, slot: amount}
+- {a: "Your plan upgrade will cost an extra ₹100 per month.", b: "Your plan upgrade will cost an extra ₹150 per month.", label: near_miss, slot: amount}

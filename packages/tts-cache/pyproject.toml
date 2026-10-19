@@ -1,0 +1,35 @@
+[project]
+name = "tts-cache"
+version = "0.1.0"
+description = "A framework-free, sentence-level cache for text-to-speech audio"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=1.26",
+    "soundfile>=0.13",
+    "sentencex>=1.0.32",
+]
+
+[project.optional-dependencies]
+redis = ["redis>=5"]
+similarity = [
+    "datasketch>=1.6",
+    "rapidfuzz>=3",
+    "model2vec>=0.4",
+    "hnswlib>=0.8",
+    "numpy>=1.26",
+    "onnxruntime>=1.17",
+    "tokenizers>=0.15",
+    "huggingface-hub>=0.20",
+]
+verify = []
+cli = []
+
+[project.scripts]
+tts-cache = "tts_cache.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tts_cache"]

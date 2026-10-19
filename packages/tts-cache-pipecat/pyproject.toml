@@ -1,0 +1,19 @@
+[project]
+name = "tts-cache-pipecat"
+version = "0.1.0"
+description = "Pipecat integration for tts-cache: read and write frame processors around a TTS service"
+requires-python = ">=3.12"
+dependencies = [
+    "tts-cache",
+    "pipecat-ai>=1.12,<1.13",
+]
+
+[project.scripts]
+tts-cache-pipecat = "tts_cache_pipecat.bench:main"
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tts_cache_pipecat"]

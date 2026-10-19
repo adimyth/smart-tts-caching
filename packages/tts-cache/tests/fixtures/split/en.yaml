@@ -1,0 +1,23 @@
+# text -> sentences, as the streaming splitter emits them (token by token or all at once).
+- text: "Acme Inc. Thanks for calling."
+  sentences: ["Acme Inc.", "Thanks for calling."]
+- text: "Welcome to Acme Inc. We are glad you called."
+  sentences: ["Welcome to Acme Inc.", "We are glad you called."]
+- text: "Dr. Smith will see you now. Thanks."
+  sentences: ["Dr. Smith will see you now.", "Thanks."]
+- text: "Mr. Rao called. He will call back."
+  sentences: ["Mr. Rao called.", "He will call back."]
+- text: "It costs Rs. 500 only. Okay?"
+  sentences: ["It costs Rs. 500 only.", "Okay?"]
+- text: "I paid $29.95 today. Fine."
+  sentences: ["I paid $29.95 today.", "Fine."]
+- text: "Hello, and thank you for calling. I can help you with your account today. Could you tell me your registered mobile number? Take your time, there is no rush."
+  sentences: ["Hello, and thank you for calling.", "I can help you with your account today.", "Could you tell me your registered mobile number?", "Take your time, there is no rush."]
+- text: "Sure! Let me check that. One moment please."
+  sentences: ["Sure!", "Let me check that.", "One moment please."]
+- text: "Albert I. Douglas came by. Then he left."
+  sentences: ["Albert I. Douglas came by.", "Then he left."]
+- text: "Is there anything else"
+  sentences: ["Is there anything else"]
+- text: "Contact Acme Ltd. Today we are open."
+  sentences: ["Contact Acme Ltd.", "Today we are open."]

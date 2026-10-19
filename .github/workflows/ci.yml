@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: smart-tts-caching
+      # The pinned Pipecat, as the workspace expects it next to this repository.
+      - uses: actions/checkout@v4
+        with:
+          repository: pipecat-ai/pipecat
+          ref: 1d1385b6d
+          path: pipecat
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+      - name: Install libsndfile
+        run: sudo apt-get update && sudo apt-get install -y libsndfile1
+      - name: Sync
+        working-directory: smart-tts-caching
+        run: uv sync
+      - name: Lint
+        working-directory: smart-tts-caching
+        run: make lint
+      - name: Unit tests
+        working-directory: smart-tts-caching
+        run: make test
