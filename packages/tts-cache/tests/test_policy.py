@@ -5,6 +5,7 @@ from store_contract import make_entry
 from tts_cache.policy import (
     DEFAULT_POLICY,
     DEFAULT_TTL_S,
+    LEVEL_C_POLICY,
     AllOf,
     AlwaysCache,
     AnyOf,
@@ -52,8 +53,10 @@ def test_default_policy() -> None:
     assert DEFAULT_POLICY.ttl_for(s, None) == 48 * 3600
     hit = make_entry("Hello there.", hit_count=1)
     assert DEFAULT_POLICY.ttl_for(s, hit) == 30 * 86400
-    assert DEFAULT_POLICY.allowed_levels(s) == {"A", "B", "C"}
+    assert DEFAULT_POLICY.allowed_levels(s) == {"A", "B"}
     assert DEFAULT_POLICY.level_b_classes(s) == {"punctuation", "filler"}
+    assert LEVEL_C_POLICY.allowed_levels(s) == {"A", "B", "C"}
+    assert LEVEL_C_POLICY.level_b_classes(s) == {"punctuation", "filler"}
     assert not DEFAULT_POLICY.should_lookup(ctx("Hi", canonical="hi"))
     assert not DEFAULT_POLICY.should_lookup(ctx("x" * 401, canonical="x" * 401))
 

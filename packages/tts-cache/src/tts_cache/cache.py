@@ -93,15 +93,19 @@ ProviderFn = Callable[[str], Awaitable["Audio | tuple[bytes, int]"]]
 ProviderStreamFn = Callable[[str], AsyncIterator[bytes]]
 
 
-def default_matcher() -> Matcher:
-    """Levels A, B and C when the ``[similarity]`` extra is installed, otherwise Level A alone."""
+def default_matcher(*, level_c: bool = False) -> Matcher:
+    """Levels A and B when the ``[similarity]`` extra is installed, otherwise Level A alone.
+
+    ``level_c`` adds the Level C matcher, which serves only under a policy that
+    allows Level C (``LEVEL_C_POLICY``).
+    """
     try:
         from tts_cache.match import Matchers
         from tts_cache.match.near import NearDuplicateMatcher
         from tts_cache.match.semantic import SemanticMatcher
     except ImportError:
         return ExactMatcher()
-    return Matchers(near=NearDuplicateMatcher(), semantic=SemanticMatcher())
+    return Matchers(near=NearDuplicateMatcher(), semantic=SemanticMatcher() if level_c else None)
 
 
 class TTSCache:

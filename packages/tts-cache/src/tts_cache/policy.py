@@ -386,7 +386,11 @@ class ByTag(Policy):
 
 
 # Probation and length bounds alone: Level A only. The default adds Level B for
-# punctuation and filler differences and Level C, which serves only in languages
-# the routing map sends to an encoder.
+# punctuation and filler differences. Level C is opt-in: the test plan of
+# 2026-10-19 found it serving a changed meaning in 11 of 12 languages, so it
+# needs LEVEL_C_POLICY and a matcher with a Level C matcher
+# (``default_matcher(level_c=True)``). It serves only in languages the routing
+# map sends to an encoder.
 BASE_POLICY = AllOf(Probation("48h", "30d"), MinChars(3, 400))
-DEFAULT_POLICY = AllOf(BASE_POLICY, LevelB(LevelB.SERVABLE), LevelC())
+DEFAULT_POLICY = AllOf(BASE_POLICY, LevelB(LevelB.SERVABLE))
+LEVEL_C_POLICY = AllOf(BASE_POLICY, LevelB(LevelB.SERVABLE), LevelC())

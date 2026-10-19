@@ -5,7 +5,7 @@ from tts_cache.canonical import SCHEMA_VERSION, canonicalise
 from tts_cache.key import build_key
 from tts_cache.match import ExactMatcher, Match, Matcher
 from tts_cache.metrics import LogSink, MetricsSink
-from tts_cache.policy import DEFAULT_POLICY, CachePolicy
+from tts_cache.policy import DEFAULT_POLICY, LEVEL_C_POLICY, CachePolicy
 from tts_cache.scope import Scope, scope_hash
 from tts_cache.split import SentenceSplitter
 from tts_cache.store import CacheStore, Entry
@@ -19,6 +19,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "DEFAULT_POLICY",
+    "LEVEL_C_POLICY",
     "SCHEMA_VERSION",
     "Audio",
     "CachePolicy",

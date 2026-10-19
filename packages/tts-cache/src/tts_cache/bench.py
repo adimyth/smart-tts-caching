@@ -34,7 +34,7 @@ import numpy as np
 from tts_cache.cache import Audio, TTSCache
 from tts_cache.corpus import Corpus, generate, write_log
 from tts_cache.metrics import LogSink
-from tts_cache.policy import BASE_POLICY, DEFAULT_POLICY
+from tts_cache.policy import BASE_POLICY, DEFAULT_POLICY, LEVEL_C_POLICY
 from tts_cache.scope import Scope
 from tts_cache.stores.memory import MemoryStore
 from tts_cache.stores.sqlite import SQLiteStore
@@ -254,7 +254,7 @@ def config_policy(levels: str) -> tuple[Any, Any]:
     if levels == "A+B":
         return AllOf(BASE_POLICY, LevelB({"punctuation", "filler"})), Matchers(near=NearDuplicateMatcher())
     if levels == "A+B+C":
-        return DEFAULT_POLICY, default_matcher()
+        return LEVEL_C_POLICY, default_matcher(level_c=True)
     raise ValueError(f"unknown configuration {levels!r}")
 
 
