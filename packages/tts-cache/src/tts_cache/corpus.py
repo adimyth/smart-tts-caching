@@ -608,7 +608,8 @@ def labelled(
             return (rng.choice(cands), "") if cands else None
         if label in ("punct_end", "punct_question"):
             v = (punct_end_variant if label == "punct_end" else punct_question_variant)(b.text, lang)
-            if v is None or not fresh([v], b) or classify(canonicalise(v, lang), c, lang) != "punctuation":
+            want = "punctuation" if label == "punct_end" else "question"
+            if v is None or not fresh([v], b) or classify(canonicalise(v, lang), c, lang) != want:
                 return None
             return v, ""
         if label == "filler":

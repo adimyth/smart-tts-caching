@@ -5,11 +5,12 @@
 2. A MinHash signature (128 permutations) and an LSH band index per
    ``(language, scope)``, held in memory over the hot set's texts only.
 3. Candidates are verified by normalised edit distance, then the token-level
-   difference is classified as ``punctuation``, ``filler``, ``slot`` or
-   ``other``.
+   difference is classified as ``punctuation``, ``filler``, ``question``,
+   ``slot`` or ``other``.
 
 Only ``punctuation`` and ``filler`` can ever be served, and only when the
-policy allows that class (``LevelB``); ``slot`` and ``other`` never are. The
+policy allows that class (``LevelB``); ``question``, ``slot`` and ``other``
+never are. The
 matcher returns the class on every probe that finds a candidate, so the
 diff histogram exists even when nothing is served.
 """
@@ -39,10 +40,11 @@ from tts_cache.match.lexicon import (
 from tts_cache.policy import Level
 from tts_cache.scope import Scope, scope_hash
 
-DiffClass = Literal["exact", "punctuation", "filler", "slot", "other"]
+DiffClass = Literal["exact", "punctuation", "filler", "question", "slot", "other"]
 SERVABLE: frozenset[str] = frozenset({"punctuation", "filler"})
 
 _DIGIT = re.compile(r"\d")
+_QUESTION = re.compile(r"[?？؟]")
 
 
 def _edge(ch: str) -> bool:
@@ -125,6 +127,10 @@ def classify(
     """The class of the difference between canonical texts ``a`` and ``b``."""
     if a == b:
         return "exact"
+    # A question mark added or removed turns a statement into a question: the intonation
+    # differs, so the pair is never punctuation or filler, whatever else differs.
+    if len(_QUESTION.findall(a)) != len(_QUESTION.findall(b)):
+        return "question"
     lang = lang_of(language)
     ta, tb = tokens(a), tokens(b)
     if ta == tb:

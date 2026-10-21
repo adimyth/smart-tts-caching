@@ -28,7 +28,7 @@ CASES = [
 def test_fixture_counts_cover_every_class(lang: str) -> None:
     cases = [c for code, c in CASES if code == lang]
     assert len(cases) >= 40
-    assert {c["class"] for c in cases} == {"punctuation", "filler", "slot", "other"}
+    assert {c["class"] for c in cases} == {"punctuation", "filler", "question", "slot", "other"}
 
 
 @pytest.mark.parametrize(("lang", "case"), CASES, ids=[f"{lang}:{c['a'][:24]}" for lang, c in CASES])
@@ -208,6 +208,38 @@ async def test_level_b_serves_only_allowed_classes_and_reports_the_histogram() -
     assert await cache.lookup("Okay, your refund has been processed.") is None  # filler: not allowed here
     assert await cache.lookup("Thanks for calling, Sam.") is None  # slot: never
     assert sink.counts["near"] == 3 and sink.counts["hit"] == 1
+    await cache.close()
+
+
+@pytest.mark.parametrize(
+    ("stored", "query"),
+    [
+        ("Your order is confirmed.", "Your order is confirmed?"),
+        ("Your order is confirmed?", "Your order is confirmed."),
+        ("Is that right?", "Is that right!"),
+        ("Your order is confirmed.", "Okay, your order is confirmed?"),
+        ("आपका ऑर्डर कन्फर्म हो गया है।", "आपका ऑर्डर कन्फर्म हो गया है?"),
+    ],
+)
+async def test_a_question_is_never_served_as_a_statement(stored: str, query: str) -> None:
+    lang = "hi" if any("\u0900" <= ch <= "\u097f" for ch in stored) else "en"
+    sc = scope(language=lang)
+    memory = MemoryStore()
+    near = NearDuplicateMatcher()
+    sink = LogSink(log=None)
+    cache = TTSCache(
+        sc,
+        TieredStore(memory, MemoryStore()),
+        policy=AllOf(Probation(), MinChars(), LevelB({"punctuation", "filler"})),
+        matcher=Matchers(near=near),
+        metrics=sink,
+    )
+    await cache.capture(stored, tone_pcm(stored), SR)
+    await cache.drain(10)
+    memory.load_warm(sc, [memory.peek(build_key(sc, canonicalise(stored, lang)))])  # type: ignore[misc]
+    near.refresh(sc, memory)
+    assert await cache.lookup(query) is None
+    assert sink.counts["near"] == 1  # the stored sentence was found and refused, not missed
     await cache.close()
 
 

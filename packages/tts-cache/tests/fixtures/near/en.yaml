@@ -4,7 +4,7 @@
 - {a: "Hello, how can I help you today?", b: "Hello how can I help you today?", class: punctuation}
 - {a: "Thank you; we'll call you back.", b: "Thank you, we'll call you back.", class: punctuation}
 - {a: "Great, see you then!", b: "Great, see you then.", class: punctuation}
-- {a: "Is that right?", b: "Is that right!", class: punctuation}
+- {a: "Is that right?", b: "Is that right!", class: question}
 - {a: "Okay - one moment please.", b: "Okay, one moment please.", class: punctuation}
 - {a: "Please hold, I'm checking.", b: "Please hold. I'm checking.", class: punctuation}
 - {a: "Your order, which you placed yesterday, has shipped.", b: "Your order which you placed yesterday has shipped.", class: punctuation}
