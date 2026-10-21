@@ -327,6 +327,7 @@ async def run_core(
     scope: Scope | None = None,
     shared_factory: Any = None,
     metrics_log: Any = None,
+    policy: Any = None,
 ) -> Run:
     """One corpus through the plain core, cache off or on.
 
@@ -338,7 +339,9 @@ async def run_core(
     and may return a dict kept on the sample. The size knobs are those of
     TEST_PLAN.md section 9. ``metrics_log`` is a logger that receives the
     cache's metric events as JSON lines, as ``LogSink`` writes them.
+    ``policy`` replaces the configuration's policy and keeps its matcher.
     """
+    policy_override = policy
     scope = scope or bench_scope(language)
     sink = _BenchSink(log=metrics_log)
     if keep_events:
@@ -368,6 +371,8 @@ async def run_core(
 
             policy = AllOf(BASE_POLICY, LevelB(level_b))
             matcher = Matchers(near=NearDuplicateMatcher())
+        if policy_override is not None:
+            policy = policy_override
         if matcher is not None:
             matcher = _TimedMatcher(matcher)
         memory = MemoryStore(warm_start_bytes=warm_start_bytes, session_bytes=session_bytes)
