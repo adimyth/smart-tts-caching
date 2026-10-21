@@ -53,6 +53,8 @@ from dotenv import load_dotenv  # noqa: E402
 from loguru import logger  # noqa: E402
 from pipecat.frames.frames import (  # noqa: E402
     AggregatedTextFrame,
+    BotStartedSpeakingFrame,
+    BotStoppedSpeakingFrame,
     ErrorFrame,
     Frame,
     InterruptionFrame,
@@ -224,7 +226,11 @@ def build_service(
     if fake:
         from fake_provider import FakeTTSService
 
-        return rest_close(FakeTTSService)(cell=name, lang=lang, run=run_id, faults=faults, seed=seed, **common)
+        # A websocket service pauses after each turn until the bot stops speaking (Pipecat's
+        # pause_frame_processing); the fake of a websocket cell does the same.
+        return rest_close(FakeTTSService)(
+            cell=name, lang=lang, run=run_id, faults=faults, seed=seed, pause_frame_processing=name not in REST, **common
+        )
     el_key = os.environ.get("ELEVENLABS_API_KEY") or os.environ.get("ELEVENLABS_TTS_KEY", "")
     el_voice = os.environ.get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
     if name == "openai_http":
@@ -337,7 +343,13 @@ class Ctx:
 
 
 class Probe(FrameProcessor):
-    """The last processor: every TTS frame per context, and a log of every frame."""
+    """The last processor: every TTS frame per context, and a log of every frame.
+
+    It also stands in for the output transport's speaking signals. Websocket services
+    pause after each turn until BotStoppedSpeakingFrame comes upstream; the probe sends
+    BotStartedSpeakingFrame at a turn's first audio and the session sends
+    BotStoppedSpeakingFrame once the turn's contexts have all stopped (playback is instant).
+    """
 
     def __init__(self, frame_log: list[list[Any]]) -> None:
         super().__init__(name="probe")
@@ -345,6 +357,12 @@ class Probe(FrameProcessor):
         self.order: list[str] = []
         self.frame_log = frame_log
         self.changed = asyncio.Event()
+        self.speaking = False
+
+    async def bot_stopped(self) -> None:
+        if self.speaking:
+            self.speaking = False
+            await self.push_frame(BotStoppedSpeakingFrame(), FrameDirection.UPSTREAM)
 
     def ctx(self, cid: str) -> Ctx:
         if cid not in self.ctxs:
@@ -373,6 +391,9 @@ class Probe(FrameProcessor):
                     c.meta.update(meta)
             elif isinstance(frame, TTSAudioRawFrame):
                 c = self.ctx(cid)
+                if frame.audio and not self.speaking:
+                    self.speaking = True
+                    await self.push_frame(BotStartedSpeakingFrame(), FrameDirection.UPSTREAM)
                 if frame.audio:
                     c.t_first_audio = c.t_first_audio or t
                     c.t_last_audio = t
@@ -1027,6 +1048,7 @@ class Session:
         if stalled:
             await self.task.queue_frame(InterruptionFrame())
             await asyncio.sleep(0.2)
+        await probe.bot_stopped()
         ctxs = [probe.ctxs[c] for c in probe.order[start_seq:]]
         reqs = self.requests[start_req:]
         errs = self.errors[start_err:]
