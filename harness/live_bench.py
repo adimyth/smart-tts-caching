@@ -87,6 +87,7 @@ from tts_cache.testplan.cells import (  # noqa: E402
     SEED,
     LiveRun,
     cells,
+    core_plan_runs,
     live_runs,
     usd,
 )
@@ -569,6 +570,8 @@ class Options:
     faults: Any = None
     crash_after_turns: int | None = None
     kill_redis_after_turns: int | None = None
+    pause_redis_after_turns: int | None = None
+    pause_redis_ms: int = 5000
     quiet: bool = True
 
 
@@ -825,6 +828,15 @@ class Harness:
     async def after_turn(self, mid_session: bool) -> None:
         self.turns_done += 1
         o = self.opts
+        if o.pause_redis_after_turns is not None and self.turns_done == o.pause_redis_after_turns:
+            # CLIENT PAUSE returns at once; the server holds every client's commands until it ends.
+            self.event("fault_redis_pause", port=o.port, ms=o.pause_redis_ms)
+            self.redis_fault_at = self.redis_fault_at or now()
+            await asyncio.to_thread(
+                subprocess.run,
+                ["redis-cli", "-p", str(o.port), "client", "pause", str(o.pause_redis_ms), "all"],
+                capture_output=True,
+            )
         if o.kill_redis_after_turns is not None and self.turns_done == o.kill_redis_after_turns:
             async with self._fault_lock:
                 self.event("fault_redis_kill", port=o.port)
@@ -1498,9 +1510,14 @@ async def preflight(out: Path, langs: list[str], *, fake: bool, concurrency: int
 # ---------------------------------------------------------------------------
 
 
-def select_runs(langs: list[str], drop_cells: list[str]) -> list[LiveRun]:
+def select_runs(langs: list[str], drop_cells: list[str], plan: str = "full") -> list[LiveRun]:
     drop = set(drop_cells)
-    return [r for r in live_runs(langs) if f"{r.lang}/{r.service}" not in drop]
+    runs = {
+        "full": live_runs(langs),
+        "core": core_plan_runs(langs),
+        "core-fault": core_plan_runs(langs, fault=True),
+    }[plan]
+    return [r for r in runs if f"{r.lang}/{r.service}" not in drop]
 
 
 def rehearsal_faults(runs: list[LiveRun]) -> Any:
@@ -1702,6 +1719,9 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--offline", type=Path, help="the offline matrix directory, for expected characters")
         p.add_argument("--fake", action="store_true", help="FakeTTSService in place of every provider (rehearsal)")
         p.add_argument("--drop", default="", help="comma list of lang/service cells dropped at preflight")
+        p.add_argument(
+            "--plan", choices=("full", "core", "core-fault"), default="full", help="TEST_PLAN.md or TEST_PLAN_CORE.md"
+        )
     run_p = sub.choices["run"]
     run_p.add_argument("--max-chars", type=int, help="refuse to start when the worst case exceeds this")
     run_p.add_argument("--concurrency", default="", help="provider=n,... (default 8 each)")
@@ -1709,6 +1729,7 @@ def main(argv: list[str] | None = None) -> int:
     run_p.add_argument("--faults", action="store_true", help="inject the sentence faults of 2.2 (with --fake)")
     run_p.add_argument("--crash-after-turns", type=int)
     run_p.add_argument("--kill-redis-after-turns", type=int)
+    run_p.add_argument("--pause-redis-after-turns", type=int, help="CLIENT PAUSE the live Redis for 5 s")
     run_p.add_argument("--only", default="", help="comma list of run ids (debugging)")
     sub.choices["preflight"].add_argument("--concurrency", type=int, default=DEFAULT_CONCURRENCY)
     sub.add_parser("netcheck").add_argument("--out", type=Path)
@@ -1730,7 +1751,7 @@ def main(argv: list[str] | None = None) -> int:
     logger.add(sys.stderr, level="WARNING")
     langs = [x for x in args.langs.split(",") if x]
     drop = [x for x in args.drop.split(",") if x]
-    runs = select_runs(langs, drop)
+    runs = select_runs(langs, drop, args.plan)
     if args.cmd == "plan":
         b = budget(runs, args.offline)
         print(json.dumps({"runs": len(runs), "cells": len({(r.lang, r.service) for r in runs}), "budget": b}, indent=1))
@@ -1776,6 +1797,7 @@ def main(argv: list[str] | None = None) -> int:
         faults=faults,
         crash_after_turns=args.crash_after_turns if not args.resume else None,
         kill_redis_after_turns=args.kill_redis_after_turns if not args.resume else None,
+        pause_redis_after_turns=args.pause_redis_after_turns if not args.resume else None,
     )
     env_path = args.out / ("env.json" if not args.resume else f"env.resume.{int(time.time())}.json")
     env_path.write_text(json.dumps({**environment(args.fake), "budget": b, "runs": [asdict(r) for r in runs]}, indent=1, default=str))
