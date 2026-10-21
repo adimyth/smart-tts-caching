@@ -16,3 +16,7 @@ harness/out/
 *.npy
 *.safetensors
 models/
+TEST_PLAN_CORE.md
+TEST_REPORT_CORE.md
+TEST_PLAN.md
+TEST_REPORT.md
