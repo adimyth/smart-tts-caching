@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart TTS Caching demo</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --line: #262b36; --text: #e6e8ee; --muted: #8b93a7;
+    --hit: #22c55e; --hitb: #38bdf8; --hitc: #a78bfa; --miss: #6b7280; --refuse: #f59e0b; --bad: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 -apple-system, "Inter", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 17px; margin: 0; font-weight: 600; }
+  header .mode { color: var(--muted); font-size: 13px; }
+  select, button, label.toggle { background: #1f2430; color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; font-size: 14px; }
+  button { cursor: pointer; }
+  button.primary { background: #2563eb; border-color: #2563eb; }
+  button:disabled { opacity: .45; cursor: default; }
+  main { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; height: calc(100vh - 56px); }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .col + .col { border-left: 1px solid var(--line); }
+  .panel { padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .panel h2 { margin: 0 0 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  #transcript { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 92%; padding: 10px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+  .msg.user { align-self: flex-end; background: #1e2a44; border-color: #27385c; }
+  .msg.agent { align-self: flex-start; }
+  .msg .who { font-size: 11px; color: var(--muted); margin-bottom: 4px; letter-spacing: .04em; }
+  .sent { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; }
+  .sent .text { flex: 1; font-size: 17px; }
+  .badge { font: 600 11px/1 ui-monospace, Menlo, monospace; padding: 4px 7px; border-radius: 6px; color: #0b0d12; white-space: nowrap; }
+  .badge.A { background: var(--hit); } .badge.B { background: var(--hitb); } .badge.C { background: var(--hitc); }
+  .badge.miss { background: var(--miss); color: #fff; } .badge.refused { background: var(--refuse); }
+  .ms { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); min-width: 70px; text-align: right; }
+  .ms.fast { color: var(--hit); font-weight: 700; }
+  .why { font-size: 13px; color: var(--muted); padding: 0 0 4px 0; }
+  .counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .tile .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .tile .v { font: 600 24px/1.2 ui-monospace, Menlo, monospace; margin-top: 4px; }
+  .tile .v small { font-size: 13px; color: var(--muted); font-weight: 400; }
+  #log { flex: 1; overflow-y: auto; padding: 10px 18px; font: 12px/1.5 ui-monospace, Menlo, monospace; color: #b7bdcc; }
+  #log .ev { white-space: pre-wrap; word-break: break-all; border-bottom: 1px dashed #1f242e; padding: 3px 0; }
+  #log .ev.hit { color: var(--hit); } #log .ev.miss { color: #9aa3b8; } #log .ev.store { color: #7dd3fc; }
+  #log .ev.fail_open, #log .ev.deadline, #log .ev.reject { color: var(--refuse); }
+  #log .ev.provider_request { color: #f472b6; }
+  .status { font-size: 13px; color: var(--muted); }
+  .status b { color: var(--text); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #475569; margin-right: 6px; vertical-align: middle; }
+  .dot.on { background: var(--hit); box-shadow: 0 0 10px var(--hit); }
+  .lines { display: flex; flex-direction: column; gap: 6px; }
+  .line { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+  .line.next { color: var(--text); }
+  .line.done { text-decoration: line-through; opacity: .5; }
+  .line .n { font: 600 11px ui-monospace, Menlo, monospace; background: #1f2430; padding: 3px 6px; border-radius: 5px; }
+  .banner { display: none; background: #3b2a06; color: #fcd34d; border: 1px solid #92400e; padding: 8px 12px; border-radius: 8px; font-size: 13px; margin-top: 8px; }
+  .banner.on { display: block; }
+  /* Stage: the clean view the launch video records. Nothing but the two voices and the conversation. */
+  body.stage header, body.stage main > .col:last-child, body.stage .panel { display: none; }
+  body.stage main { display: block; height: 100vh; }
+  body.stage #transcript { display: none; }
+  #stage { display: none; }
+  body.stage #stage { display: flex; flex-direction: column; height: 100vh; padding: 56px 120px 48px; }
+  .people { display: flex; gap: 40px; justify-content: center; margin-bottom: 36px; }
+  .person { display: flex; align-items: center; gap: 18px; padding: 16px 28px; border-radius: 18px; background: var(--panel); border: 2px solid var(--line); transition: border-color .2s, box-shadow .2s; min-width: 360px; }
+  .person .avatar { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font: 700 22px -apple-system, system-ui, sans-serif; color: #0b0d12; }
+  .person.caller .avatar { background: #93c5fd; } .person.agent .avatar { background: #fda4af; }
+  .person .name { font-size: 24px; font-weight: 600; } .person .role { font-size: 15px; color: var(--muted); }
+  .person.on { border-color: var(--hit); box-shadow: 0 0 28px rgba(34,197,94,.35); }
+  #convo { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 16px; overflow: hidden; }
+  .line-s { max-width: 78%; padding: 16px 24px; border-radius: 20px; background: var(--panel); border: 1px solid var(--line); font-size: 30px; line-height: 1.35; animation: rise .25s ease-out; }
+  .line-s.caller { align-self: flex-end; background: #1e2a44; border-color: #27385c; }
+  .line-s.agent { align-self: flex-start; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .line-s .stored { flex-basis: 100%; font-size: 21px; color: var(--muted); padding-top: 4px; }
+  .line-s .stored .k { font: 600 13px ui-monospace, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; color: #a78bfa; margin-right: 10px; }
+  .line-s .badge { font-size: 15px; padding: 7px 11px; }
+  .line-s .ms { font-size: 18px; min-width: 0; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  #stageNote { flex: none; margin-top: 18px; font-size: 17px; color: var(--muted); text-align: center; }
+  #summary { display: none; position: fixed; inset: 0; background: var(--bg); place-items: center; text-align: center; }
+  #summary.on { display: grid; }
+  #summary .big { font-size: 64px; font-weight: 700; line-height: 1.15; }
+  #summary .sub { font-size: 34px; color: var(--text); margin-top: 28px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Smart TTS Caching</h1>
+  <span class="mode" id="modeLabel"></span>
+  <span style="flex:1"></span>
+  <select id="callSelect"></select>
+  <button id="connectBtn" class="primary">Connect</button>
+  <button id="hangupBtn" disabled>Hang up</button>
+</header>
+<div id="stage">
+  <div class="people">
+    <div class="person agent" id="pAgent"><div class="avatar" id="pAgentAvatar">A</div><div><div class="name" id="pAgentName">Agent</div><div class="role">voice agent</div></div></div>
+    <div class="person caller" id="pCaller"><div class="avatar">R</div><div><div class="name" id="pCallerName">Caller</div><div class="role">calling the appointment desk</div></div></div>
+  </div>
+  <div id="convo"></div>
+  <div id="stageNote">Timings are for text-to-speech only: from a sentence being ready to speak until its first audio. The first sentence of a turn shows that wait; later cached sentences show the cache lookup time.</div>
+</div>
+<div id="summary"><div><div class="big" id="sumBig"></div><div class="sub" id="sumSub"></div></div></div>
+<main>
+  <section class="col">
+    <div class="panel status">
+      <span class="dot" id="dot"></span><span id="status">Not connected</span>
+      &nbsp;·&nbsp; agent <b id="speaking">silent</b>
+      &nbsp;·&nbsp; warm start <b id="warm">–</b>
+      <div class="banner" id="banner"></div>
+    </div>
+    <div id="transcript"></div>
+    <div class="panel">
+      <h2>Caller</h2>
+      <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap: wrap">
+        <button id="nextBtn" disabled>▶ Next line</button>
+        <label class="toggle"><input type="checkbox" id="auto" checked> auto-advance</label>
+        <label class="toggle"><input type="checkbox" id="mic"> my microphone</label>
+        <span style="flex:1"></span>
+        <button id="pauseBtn" disabled>Pause Redis 5 s</button>
+      </div>
+      <div class="lines" id="lines"></div>
+    </div>
+  </section>
+  <section class="col">
+    <div class="panel">
+      <h2>This call</h2>
+      <div class="counters">
+        <div class="tile"><div class="k">Sentences</div><div class="v" id="cSent">0</div></div>
+        <div class="tile"><div class="k">From cache</div><div class="v" id="cHits">0 <small id="cHitsPct"></small></div></div>
+        <div class="tile"><div class="k">Provider requests</div><div class="v" id="cReq">0</div></div>
+        <div class="tile"><div class="k">Characters billed</div><div class="v" id="cBilled">0</div></div>
+        <div class="tile"><div class="k">Characters from cache</div><div class="v" id="cCached">0</div></div>
+        <div class="tile"><div class="k">Turn start from cache</div><div class="v" id="cHitMs">– <small>ms</small></div></div>
+      </div>
+    </div>
+    <div class="panel"><h2>Cache log</h2></div>
+    <div id="log"></div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let config = null, call = null, pc = null, ctx = null, dest = null, micStream = null, micTrack = null;
+  let lineIndex = 0, playing = false, auto = true, botSpeaking = false, advanceTimer = null;
+  let recDest = null, recorder = null, recChunks = [], pauseBeforeLine = null, allLinesDone = false;
+  const lookupMs = {};  // cache key -> lookup time of its hit
+  const params = new URLSearchParams(location.search);
+  window.__events = [];
+  const STAGE = params.get('stage') === '1';
+  const TALK = params.get('talk') === '1';  // you are the caller: microphone on, no scripted lines
+  if (STAGE) document.body.classList.add('stage');
+  let counters;
+
+  function resetCounters() {
+    counters = { sentences: 0, hits: 0, requests: 0, billed: 0, cached: 0, hitMs: [] };
+    renderCounters();
+  }
+  function renderCounters() {
+    $('cSent').textContent = counters.sentences;
+    $('cHits').firstChild.textContent = counters.hits + ' ';
+    $('cHitsPct').textContent = counters.sentences ? Math.round(100 * counters.hits / counters.sentences) + '%' : '';
+    $('cReq').textContent = counters.requests;
+    $('cBilled').textContent = counters.billed.toLocaleString();
+    $('cCached').textContent = counters.cached.toLocaleString();
+    const ms = counters.hitMs;
+    $('cHitMs').firstChild.textContent = ms.length ? (ms.reduce((a, b) => a + b, 0) / ms.length).toFixed(1) + ' ' : '– ';
+  }
+
+  async function loadConfig() {
+    config = await (await fetch('/api/config')).json();
+    $('modeLabel').textContent = `mode: ${config.mode}${config.llm ? ', ' + config.llm : ''}${config.custom_prompt ? ', your prompt' : ''}, Level C ${config.level_c ? 'on' : 'off'}`;
+    const sel = $('callSelect');
+    sel.innerHTML = '';
+    for (const c of config.calls) {
+      const o = document.createElement('option');
+      o.value = c.id;
+      o.textContent = `${c.id}  ·  ${c.language.toUpperCase()}  ·  ${c.caller}${c.fills ? '  (fills the cache)' : ''}`;
+      sel.appendChild(o);
+    }
+    $('pAgentName').textContent = config.agent; $('pAgentAvatar').textContent = config.agent[0];
+    selectCall(params.get('call') || config.calls[0].id);
+    sel.value = call.id;
+    sel.onchange = () => selectCall(sel.value);
+    if (params.get('pause')) pauseBeforeLine = parseInt(params.get('pause'), 10);
+    if (TALK) { $('mic').checked = true; $('auto').checked = false; auto = false; $('pCallerName').textContent = 'You'; $('pCaller').querySelector('.avatar').textContent = 'Y'; }
+  }
+
+  function selectCall(id) {
+    call = config.calls.find(c => c.id === id);
+    lineIndex = 0;
+    $('pCallerName').textContent = call.caller; $('pCaller').querySelector('.avatar').textContent = call.caller[0];
+    renderLines();
+  }
+
+  function renderLines() {
+    const box = $('lines');
+    box.innerHTML = '';
+    call.lines.forEach((text, i) => {
+      const d = document.createElement('div');
+      d.className = 'line' + (i < lineIndex ? ' done' : i === lineIndex ? ' next' : '');
+      d.innerHTML = `<span class="n">${i + 1}</span><span>${escape(text)}</span>`;
+      box.appendChild(d);
+    });
+    $('nextBtn').disabled = !pc || lineIndex >= call.lines.length || playing || $('mic').checked;
+  }
+
+  function escape(s) { return String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+
+  // ---- transcript -------------------------------------------------------
+  let currentAgent = null;
+  function addStored(row, spoken) {
+    if (row.querySelector('.stored')) return;
+    const d = document.createElement('div');
+    d.className = 'stored';
+    d.innerHTML = `<span class="k">stored clip</span> ${escape(spoken)}`;
+    row.appendChild(d);
+  }
+  function stageLine(kind, html) {
+    const c = $('convo');
+    const d = document.createElement('div');
+    d.className = 'line-s ' + kind;
+    d.innerHTML = html;
+    c.appendChild(d);
+    while (c.children.length > 7) c.removeChild(c.firstChild);
+    return d;
+  }
+  function addUser(text) {
+    currentAgent = null;
+    if (STAGE) return;
+    const d = document.createElement('div');
+    d.className = 'msg user';
+    d.innerHTML = `<div class="who">${escape(call.caller)}</div><div class="text">${escape(text)}</div>`;
+    $('transcript').appendChild(d);
+    scrollTranscript();
+  }
+  function addSentence(ev) {
+    if (ev.first_audio_ms == null) window.__demo.noAudio += 1;
+    if (!currentAgent) {
+      currentAgent = document.createElement('div');
+      currentAgent.className = 'msg agent';
+      currentAgent.innerHTML = `<div class="who">${escape(config.agent)}, agent</div>`;
+      $('transcript').appendChild(currentAgent);
+    }
+    const row = document.createElement('div');
+    row.className = 'sent';
+    let badge, cls;
+    if (ev.hit) { badge = 'HIT ' + ev.level + (!STAGE && ev.diff_class && ev.diff_class !== 'exact' ? ': ' + ev.diff_class : ''); cls = ev.level; }
+    else { badge = 'MISS'; cls = 'miss'; }
+    let ms = ev.first_audio_ms == null || !ev.first_in_turn ? '' : ev.first_audio_ms.toFixed(1) + ' ms';
+    // A later sentence in a turn waits for the previous audio, so its time to first audio is playback; show the cache's own lookup time for a hit instead.
+    if (!ms && ev.hit && ev.key && lookupMs[ev.key] != null) ms = lookupMs[ev.key].toFixed(1) + ' ms';
+    if (STAGE) {
+      const exp = call.expect[ev.text];
+      const reason = exp && exp.short ? ': ' + exp.short : '';
+      const row = stageLine('agent', `<span class="badge ${cls}">${badge}${reason}</span><span class="text">${escape(ev.text)}</span><span class="ms ${ev.hit ? 'fast' : ''}">${ms}</span>`);
+      row.dataset.cid = ev.cid || '';
+      if (ev.spoken) addStored(row, ev.spoken);
+      counters.sentences += 1;
+      if (ev.hit) { counters.hits += 1; counters.cached += ev.text.length; if (ev.first_audio_ms != null && ev.first_in_turn) counters.hitMs.push(ev.first_audio_ms); }
+      return;
+    }
+    row.dataset.cid = ev.cid || '';
+    row.innerHTML = `<span class="badge ${cls}">${badge}</span><span class="text">${escape(ev.text)}</span><span class="ms ${ev.hit ? 'fast' : ''}">${ms}</span>`;
+    currentAgent.appendChild(row);
+    const exp = call.expect[ev.text];
+    if (exp && exp.why) {
+      const w = document.createElement('div');
+      w.className = 'why';
+      w.textContent = exp.why;
+      currentAgent.appendChild(w);
+    }
+    counters.sentences += 1;
+    if (ev.hit) { counters.hits += 1; counters.cached += ev.text.length; if (ev.first_audio_ms != null && ev.first_in_turn) counters.hitMs.push(ev.first_audio_ms); }
+    renderCounters();
+    scrollTranscript();
+  }
+  function patchSentence(ev) {
+    const row = document.querySelector(`.sent[data-cid="${ev.cid}"], .line-s[data-cid="${ev.cid}"]`);
+    if (!row) return;
+    row.querySelector('.text').textContent = ev.text;
+    const expS = call.expect[ev.text]; const b = row.querySelector('.badge');
+    if (STAGE && expS && expS.short && b && !b.textContent.includes(':')) b.textContent += ': ' + expS.short;
+    if (STAGE && ev.spoken) addStored(row, ev.spoken);
+    counters.cached += ev.text.length; renderCounters();
+    const exp = call.expect[ev.text];
+    if (!STAGE && exp && exp.why) { const w = document.createElement('div'); w.className = 'why'; w.textContent = exp.why; row.after(w); }
+  }
+  function scrollTranscript() { const t = $('transcript'); t.scrollTop = t.scrollHeight; }
+
+  function log(ev) {
+    const d = document.createElement('div');
+    const kind = ev.type === 'cache' ? ev.event : ev.type;
+    d.className = 'ev ' + kind;
+    const { t, type, call: _c, ...rest } = ev;
+    d.textContent = `${new Date(t * 1000).toLocaleTimeString([], { hour12: false })}.${String(Math.round((t % 1) * 1000)).padStart(3, '0')}  ${kind.padEnd(16)} ${JSON.stringify(rest)}`;
+    const box = $('log');
+    box.appendChild(d);
+    while (box.children.length > 300) box.removeChild(box.firstChild);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ---- events -----------------------------------------------------------
+  function connectEvents() {
+    const es = new EventSource('/api/events');
+    es.onmessage = m => {
+      const ev = JSON.parse(m.data);
+      window.__events.push(ev.type + (ev.text ? ' ' + ev.text.slice(0, 40) : ''));
+      if (ev.type === 'hello') return;
+      if (ev.call && call && ev.call !== call.id) return;
+      switch (ev.type) {
+        case 'user': addUser(ev.text); break;
+        case 'sentence': addSentence(ev); log(ev); break;
+        case 'sentence_text': patchSentence(ev); break;
+        case 'provider_request': counters.requests += 1; counters.billed += ev.chars; renderCounters(); log(ev); break;
+        case 'cache': if (ev.event === 'hit' && ev.key) lookupMs[ev.key] = ev.lookup_ms; log(ev); break;
+        case 'warm_start': $('warm').textContent = ev.ms + ' ms'; log(ev); break;
+        case 'bot_started': botSpeaking = true; $('speaking').textContent = 'speaking'; $('pAgent').classList.add('on'); clearTimeout(advanceTimer); break;
+        case 'bot_stopped': botSpeaking = false; $('speaking').textContent = 'silent'; $('pAgent').classList.remove('on'); break;
+        case 'turn_done': if (allLinesDone) { window.__demo.state = 'done'; showSummary(); } else scheduleAdvance(); break;
+        case 'redis_paused': showBanner(`Redis paused for ${ev.ms / 1000} s. The cache fails open: lookups give up at 20 ms and go to the provider; hits in process memory still play.`, ev.ms); log(ev); break;
+        case 'connected': $('status').textContent = `Connected · ${call.id}`; $('dot').classList.add('on'); break;
+        case 'disconnected': case 'call_ended': log(ev); break;
+        default: log(ev);
+      }
+    };
+  }
+  function showSummary() {
+    if (!STAGE) return;
+    const n = counters.sentences, h = counters.hits;
+    $('sumBig').textContent = h ? `${h} of ${n} sentences played from the cache` : `${n} sentences, all from the provider`;
+    const ms = counters.hitMs; const avg = ms.length ? (ms.reduce((a, b) => a + b, 0) / ms.length).toFixed(1) : null;
+    $('sumSub').innerHTML = h ? `${counters.requests} provider requests instead of ${n}<br>${counters.cached.toLocaleString()} characters never billed${avg ? `<br>cached turns started in ${avg} ms on average` : ''}` : 'The cache is filled for the next call';
+    setTimeout(() => $('summary').classList.add('on'), 900);
+  }
+  function showBanner(text, ms) {
+    const b = $('banner'); b.textContent = text; b.classList.add('on');
+    setTimeout(() => b.classList.remove('on'), ms + 1500);
+  }
+  function scheduleAdvance() {
+    if (!auto || $('mic').checked || !pc) return;
+    clearTimeout(advanceTimer);
+    advanceTimer = setTimeout(() => { if (!botSpeaking && !playing) playNext(); }, 900);
+  }
+
+  // ---- the call ---------------------------------------------------------
+  async function connect() {
+    resetCounters();
+    $('transcript').innerHTML = '';
+    $('log').innerHTML = '';
+    lineIndex = 0; currentAgent = null;
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+    await ctx.resume();
+    dest = ctx.createMediaStreamDestination();
+    if (window.__recordOnConnect) recDest = ctx.createMediaStreamDestination();
+    pc = new RTCPeerConnection({});
+    pc.addTrack(dest.stream.getAudioTracks()[0], dest.stream);
+    const remote = new Audio();
+    remote.autoplay = true;
+    pc.ontrack = e => {
+      remote.srcObject = e.streams[0]; remote.play().catch(() => {});
+      if (recDest) { try { ctx.createMediaStreamSource(e.streams[0]).connect(recDest); } catch (err) { console.error(err); } }
+    };
+    pc.onconnectionstatechange = () => {
+      $('status').textContent = `${pc.connectionState} · ${call.id}`;
+      if (['failed', 'closed', 'disconnected'].includes(pc.connectionState)) hangup();
+    };
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await new Promise(res => {
+      if (pc.iceGatheringState === 'complete') return res();
+      const check = () => { if (pc.iceGatheringState === 'complete') { pc.removeEventListener('icegatheringstatechange', check); res(); } };
+      pc.addEventListener('icegatheringstatechange', check);
+      setTimeout(res, 1500);
+    });
+    const r = await fetch('/api/offer', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sdp: pc.localDescription.sdp, type: pc.localDescription.type, request_data: { call: call.id } }),
+    });
+    const answer = await r.json();
+    await pc.setRemoteDescription({ sdp: answer.sdp, type: answer.type });
+    $('connectBtn').disabled = true; $('hangupBtn').disabled = false; $('pauseBtn').disabled = false; $('callSelect').disabled = true;
+    if ($('mic').checked) await useMic(true);
+    renderLines();
+  }
+
+  function hangup() {
+    if (pc) { pc.close(); pc = null; }
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; micTrack = null; }
+    if (ctx) { ctx.close(); ctx = null; }
+    $('connectBtn').disabled = false; $('hangupBtn').disabled = true; $('pauseBtn').disabled = true; $('callSelect').disabled = false;
+    $('status').textContent = 'Not connected'; $('dot').classList.remove('on');
+    renderLines();
+  }
+
+  async function playNext() {
+    if (!pc || playing || lineIndex >= call.lines.length) return;
+    playing = true; renderLines();
+    $('pCaller').classList.add('on');
+    const n = lineIndex + 1;
+    if (STAGE) { currentAgent = null; stageLine('caller', escape(call.lines[lineIndex])); }
+    const buf = await (await fetch(`/static/caller/${config.language}/${call.id}/${n}.mp3`)).arrayBuffer();
+    const audio = await ctx.decodeAudioData(buf);
+    const src = ctx.createBufferSource();
+    src.buffer = audio;
+    src.connect(dest);           // into the call
+    src.connect(ctx.destination); // and out loud, so a screen recording hears the caller too
+    if (recDest) src.connect(recDest);
+    if (pauseBeforeLine === n) { await fetch('/api/redis/pause', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ms: 5000 }) }); await new Promise(res => setTimeout(res, 300)); }
+    await new Promise(res => { src.onended = res; src.start(); });
+    await new Promise(res => setTimeout(res, 150));
+    lineIndex += 1; playing = false; renderLines();
+    $('pCaller').classList.remove('on');
+    if (lineIndex >= call.lines.length) allLinesDone = true;
+  }
+
+  async function useMic(on) {
+    const sender = pc && pc.getSenders().find(s => s.track && s.track.kind === 'audio');
+    if (!sender) return;
+    if (on) {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      micTrack = micStream.getAudioTracks()[0];
+      await sender.replaceTrack(micTrack);
+    } else {
+      await sender.replaceTrack(dest.stream.getAudioTracks()[0]);
+      if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; micTrack = null; }
+    }
+    renderLines();
+  }
+
+  $('connectBtn').onclick = () => connect().catch(e => { console.error(e); $('status').textContent = 'failed: ' + e.message; hangup(); });
+  $('hangupBtn').onclick = hangup;
+  $('nextBtn').onclick = playNext;
+  $('auto').onchange = e => { auto = e.target.checked; };
+  $('mic').onchange = e => { if (pc) useMic(e.target.checked); else renderLines(); };
+  $('pauseBtn').onclick = () => fetch('/api/redis/pause', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ms: 5000 }) });
+
+  // ---- automation hooks for demo/record_video.py ------------------------
+  window.__demo = {
+    state: 'idle',
+    noAudio: 0,
+    audio() { return ctx ? { state: ctx.state, t: ctx.currentTime, lineIndex, playing } : null; },
+    async start() {
+      // Record the call's audio (caller lines and the agent) from the page's own mix. A white flash
+      // and a short beep mark the same instant on the screen recording and on this audio track.
+      // The recorder's mix is created before the call connects, so the agent's track joins it.
+      window.__recordOnConnect = true;
+      await connect();
+      // A faint constant signal keeps the track producing frames through silence; without it the
+      // recorder emits nothing until the first sound, and the timeline collapses.
+      const keep = ctx.createConstantSource(); keep.offset.value = 0.0005; keep.connect(recDest); keep.start();
+      recChunks = [];
+      recorder = new MediaRecorder(recDest.stream, { mimeType: 'audio/webm;codecs=opus' });
+      recorder.ondataavailable = e => { if (e.data.size) recChunks.push(e.data); };
+      recorder.start(250);
+      await new Promise(res => setTimeout(res, 400));
+      const osc = ctx.createOscillator(); osc.frequency.value = 1000;
+      const g = ctx.createGain(); g.gain.value = 0.8; osc.connect(g); g.connect(recDest);
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999';
+      document.body.appendChild(flash);
+      osc.start(); osc.stop(ctx.currentTime + 0.12);
+      setTimeout(() => flash.remove(), 120);
+      window.__demo.state = 'recording';
+    },
+    stop() {
+      return new Promise(res => {
+        recorder.onstop = () => {
+          const b = new Blob(recChunks, { type: 'audio/webm' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${call.id}.audio.webm`; a.click();
+          res(b.size);
+        };
+        recorder.stop();
+      });
+    },
+  };
+
+  resetCounters();
+  loadConfig().then(connectEvents);
+})();
+</script>
+</body>
+</html>

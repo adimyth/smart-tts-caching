@@ -7,7 +7,9 @@ dependencies = [
     "tts-cache[redis,cli,similarity]",
     "tts-cache-pipecat",
     # The harness drives these services against the live APIs.
-    "pipecat-ai[openai,elevenlabs,sarvam]",
+    "pipecat-ai[openai,elevenlabs,sarvam,webrtc,silero]",
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
     "python-dotenv>=1",
     "aiohttp>=3.14",
 ]
@@ -42,6 +44,9 @@ extend-exclude = ["harness"]
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "ASYNC", "RUF"]
 ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"demo/*" = ["E501", "RUF012", "ASYNC230", "ASYNC240"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["tts_cache", "tts_cache_pipecat"]

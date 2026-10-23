@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>card</title>
+<style>
+  :root { --bg: #0f1115; --text: #e6e8ee; --muted: #8b93a7; --hit: #22c55e; --hitb: #38bdf8; --hitc: #a78bfa; --accent: #2563eb; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; background: var(--bg); color: var(--text); font: 32px/1.4 -apple-system, "Inter", system-ui, sans-serif; overflow: hidden; }
+  .card { position: absolute; inset: 0; padding: 120px 160px; display: flex; flex-direction: column; justify-content: center; }
+  .kicker { font-size: 26px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 28px; }
+  h1 { font-size: 88px; line-height: 1.05; margin: 0 0 28px; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 64px; line-height: 1.1; margin: 0 0 24px; font-weight: 700; }
+  .sub { font-size: 38px; color: var(--muted); max-width: 1400px; }
+  .foot { position: absolute; left: 160px; right: 160px; bottom: 90px; display: flex; justify-content: space-between; font-size: 26px; color: var(--muted); }
+  .badges { display: flex; gap: 18px; margin-top: 44px; }
+  .badge { font: 700 26px ui-monospace, Menlo, monospace; padding: 12px 18px; border-radius: 10px; color: #0b0d12; }
+  .A { background: var(--hit); } .B { background: var(--hitb); } .C { background: var(--hitc); } .miss { background: #6b7280; color: #fff; }
+  table { border-collapse: collapse; margin-top: 36px; font-size: 34px; }
+  td, th { text-align: left; padding: 14px 40px 14px 0; border-bottom: 1px solid #262b36; }
+  th { color: var(--muted); font-weight: 600; font-size: 26px; text-transform: uppercase; letter-spacing: .08em; }
+  td.n { font: 600 40px ui-monospace, Menlo, monospace; }
+  .green { color: var(--hit); }
+  .small { font-size: 26px; color: var(--muted); margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="card" id="card"></div>
+<script>
+  const kind = new URLSearchParams(location.search).get('kind') || 'intro';
+  const cards = {
+    intro: `
+      <div class="kicker">Smart TTS Caching</div>
+      <h1>The agent already said that.<br>Why pay to synthesise it again?</h1>
+      <div class="sub">A sentence-level audio cache for Pipecat voice agents.</div>
+      <div class="foot"><span>github.com/adimyth/smart-tts-caching</span><span></span></div>`,
+    'call-call-1': `
+      <div class="kicker">Call 1, empty cache</div>
+      <h2>Rohan books an appointment.</h2>
+      <div class="sub">Every sentence the agent says goes to the provider.</div>
+      <div class="foot"><span></span><span>1 / 2</span></div>`,
+    'call-call-2': `
+      <div class="kicker">Call 2, next day, warm cache</div>
+      <h2>Rohan calls back to move it.</h2>
+      <div class="sub">Lines the agent has said before play from the cache. Anything that changes a fact goes to the provider.</div>
+      <div class="foot"><span></span><span>2 / 2</span></div>`,
+    outro: `
+      <div class="kicker">Try it</div>
+      <h1>github.com/adimyth/<br>smart-tts-caching</h1>
+      <div class="foot"><span></span><span></span></div>`,
+  };
+  document.getElementById('card').innerHTML = cards[kind];
+</script>
+</body>
+</html>
