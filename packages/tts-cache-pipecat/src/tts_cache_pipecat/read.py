@@ -305,7 +305,14 @@ class TTSCacheRead(FrameProcessor):
         except Exception as e:
             self._fail_open("read.play", e)
         stopped = TTSStoppedFrame(context_id=context_id)
-        stopped.metadata[META] = {"hit": True, "key": hit.key, "level": hit.level, "spoken_text": spoken}
+        stopped.metadata[META] = {
+            "hit": True,
+            "key": hit.key,
+            "level": hit.level,
+            "spoken_text": spoken,
+            # What the LLM asked to say; differs from spoken_text on a Level B or C hit.
+            "requested_text": filtered,
+        }
         await self.push_frame(mark(stopped))
         try:
             if push_aggregation:

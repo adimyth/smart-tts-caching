@@ -6,7 +6,9 @@ event in either arrival order, collects the audio frames tagged with its
 context id, and closes on its stop frame, the next context's start frame, or
 the end of the LLM response. Only a clean, confirmed clip of plausible
 duration reaches ``cache.capture``. An interruption drops every capture not
-yet handed over, so a truncated clip never enters the store.
+yet handed over, so a truncated clip never enters the store. Behind a
+fallback service, a clip with any audio not marked as the primary's is not
+stored.
 
 On a hit's stop frame the write side emits the sentence's ``TTSTextFrame``
 just before forwarding the stop frame, so the assistant context records the
@@ -36,7 +38,7 @@ from tts_cache import TTSCache
 from tts_cache.checks import pcm_duration_ms, plausible_duration
 from tts_cache.metrics import FailOpen
 from tts_cache_pipecat._bridge import bridge_for
-from tts_cache_pipecat.compat import capture_mode_for
+from tts_cache_pipecat.compat import PRIMARY_AUDIO, capture_mode_for, is_fallback_service
 
 META = "tts_cache"
 
@@ -54,6 +56,7 @@ class _Capture:
     rejected: bool = False
     clean: bool = True
     closed: bool = False
+    fallback: bool = False
 
 
 class TTSCacheWrite(FrameProcessor):
@@ -67,8 +70,10 @@ class TTSCacheWrite(FrameProcessor):
         self._latest_started: str | None = None
         self._hit_append: dict[str, bool] = {}
         self._mode = "off"
+        self._attested = False
         try:
             self._mode = capture_mode_for(tts)
+            self._attested = is_fallback_service(tts)
             tts.add_event_handler("on_tts_request", self._on_tts_request)
         except Exception as e:
             self._fail_open("write.init", e)
@@ -187,6 +192,10 @@ class TTSCacheWrite(FrameProcessor):
         if cap.closed or (self._latest_started is not None and self._latest_started != cap.context_id):
             cap.clean = False
             return
+        if self._attested and not frame.metadata.get(PRIMARY_AUDIO):
+            # A fallback provider spoke this, in a voice the scope does not name.
+            cap.fallback = True
+            return
         if cap.sample_rate is None:
             cap.sample_rate, cap.channels = frame.sample_rate, frame.num_channels
         elif (cap.sample_rate, cap.channels) != (frame.sample_rate, frame.num_channels):
@@ -215,6 +224,9 @@ class TTSCacheWrite(FrameProcessor):
             return  # counted as key_mismatch when it was rejected
         if not cap.confirmed:
             self._event("reject", cap, reason="unconfirmed")
+            return
+        if cap.fallback:
+            self._event("reject", cap, reason="fallback")
             return
         if not cap.clean:
             self._event("reject", cap, reason="unclean")

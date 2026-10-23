@@ -256,6 +256,12 @@ async def test_level_c_hit_writes_the_stored_text_to_the_transcript() -> None:
     frames = await run_cached(cache, tts, turn(spoken_by_llm, S[0]))
     spoken = contexts(frames)
     assert spoken[0].hit and spoken[0].texts == [stored]  # the words that were spoken
+    meta = next(
+        f.metadata["tts_cache"]
+        for f in frames
+        if type(f).__name__ == "TTSStoppedFrame" and f.metadata.get("tts_cache")
+    )
+    assert (meta["spoken_text"], meta["requested_text"]) == (stored, spoken_by_llm)
     assert bytes(spoken[0].audio) == tone_pcm(stored, SR)
     assert tts.synthesized == [S[0]]  # nothing for the Level C sentence
     appended = [f.text for f in frames if type(f).__name__ == "TTSTextFrame" and f.append_to_context]

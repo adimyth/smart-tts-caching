@@ -6,13 +6,19 @@ or any class under another Pipecat version is ``serve_only``: it can be
 served from the cache but never captured from, so a service whose
 attribution has not been verified can forgo captures but never store a
 wrong clip.
+
+A fallback service speaks through a primary provider and switches to another
+when the primary fails. Its scope is the primary's, and audio is stored only
+from frames the service marks as the primary's, so a sentence a fallback
+provider spoke never enters the store under the primary's voice.
 """
 
-from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from collections.abc import Callable, Iterable, Mapping
+from dataclasses import dataclass, replace
 from importlib.metadata import version
 from typing import Any, Literal
 
+from pipecat.frames.frames import Frame
 from pipecat.services.elevenlabs.dialogue.tts import ElevenLabsDialogueTTSService as _StockDialogue
 from pipecat.services.elevenlabs.tts import ElevenLabsHttpTTSService
 from pipecat.services.elevenlabs.tts import ElevenLabsTTSService as _StockElevenLabs
@@ -72,6 +78,12 @@ CAPTURE_MODES: dict[type, CaptureMode] = {
 }
 
 
+FALLBACK_SERVICES: dict[type, Callable[[TTSService], TTSService]] = {}
+
+# Frame metadata key a fallback service sets on audio its primary provider produced.
+PRIMARY_AUDIO = "tts_cache_primary"
+
+
 def register_service(
     cls: type, service: str, settings: Iterable[str] = (), *, capture_mode: CaptureMode | None = None
 ) -> None:
@@ -79,6 +91,30 @@ def register_service(
     SERVICES[cls] = ServiceSpec(service, tuple(settings))
     if capture_mode is not None:
         CAPTURE_MODES[cls] = capture_mode
+
+
+def register_fallback_service(
+    cls: type, *, primary: Callable[[TTSService], TTSService], capture_mode: CaptureMode = "exact"
+) -> None:
+    """Teach the adapter a service that speaks through ``primary(service)`` and falls back to others.
+
+    The primary's class must be known to the adapter (built in, or added with
+    :func:`register_service`). The service must call :func:`mark_primary_audio`
+    on every audio frame the primary produced; a sentence with any unmarked
+    audio is not stored.
+    """
+    FALLBACK_SERVICES[cls] = primary
+    CAPTURE_MODES[cls] = capture_mode
+
+
+def mark_primary_audio(frame: Frame) -> Frame:
+    """Mark ``frame`` as audio from the fallback service's primary provider."""
+    frame.metadata[PRIMARY_AUDIO] = True
+    return frame
+
+
+def is_fallback_service(tts: TTSService) -> bool:
+    return type(tts) in FALLBACK_SERVICES
 
 
 def pipecat_version() -> str:
@@ -108,6 +144,9 @@ def scope_from_settings(
     tts: TTSService, settings: TTSSettings, *, language: str, sample_rate: int | None = None
 ) -> Scope:
     """The scope ``tts`` would synthesise with under ``settings``."""
+    if is_fallback_service(tts):
+        # Its settings may not reach the primary; a scope we cannot vouch for must not serve.
+        raise UnsupportedService(f"{type(tts).__name__} is a fallback service; its settings cannot change")
     spec = _spec(tts)
     # Until the pipeline starts a service built without a sample rate does not know
     # it; the scope then carries 0, which matches nothing, and the read side fills
@@ -142,8 +181,18 @@ def scope_from_service(tts: TTSService, *, language: str, sample_rate: int | Non
     Raises :class:`UnsupportedService` for a class the adapter does not know or a
     service with no model or voice. A sample rate the service does not know yet
     is 0 until the pipeline's StartFrame supplies it.
+
+    A fallback service has its primary's scope at the sample rate the fallback
+    service itself emits.
     """
-    return scope_from_settings(tts, tts._settings, language=language, sample_rate=sample_rate)
+    primary = FALLBACK_SERVICES.get(type(tts))
+    if primary is None:
+        return scope_from_settings(tts, tts._settings, language=language, sample_rate=sample_rate)
+    rate = sample_rate or getattr(tts, "_init_sample_rate", None) or tts.sample_rate or 0
+    inner = primary(tts)
+    if inner is None:
+        raise UnsupportedService(f"{type(tts).__name__} has no primary provider")
+    return replace(scope_from_settings(inner, inner._settings, language=language), sample_rate=int(rate))
 
 
 def settings_after(

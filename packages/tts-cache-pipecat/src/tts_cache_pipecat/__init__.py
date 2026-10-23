@@ -3,6 +3,8 @@
 from tts_cache_pipecat.compat import (
     UnsupportedService,
     capture_mode_for,
+    mark_primary_audio,
+    register_fallback_service,
     register_service,
     scope_from_service,
 )
@@ -23,6 +25,8 @@ __all__ = [
     "UnsupportedService",
     "__version__",
     "capture_mode_for",
+    "mark_primary_audio",
+    "register_fallback_service",
     "register_service",
     "scope_from_service",
 ]
