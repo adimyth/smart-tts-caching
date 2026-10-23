@@ -1,0 +1,9 @@
+Copyright (c) 2026 Aditya Mishra
+
+Permission is granted to anyone to use, copy, modify, and distribute this software and its documentation, with or without modification, for any purpose, including commercial purposes, subject to the following conditions:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions, and the disclaimer below.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions, and the disclaimer below in the documentation or other materials provided with the distribution.
+3. If you use this software in a product or service, you must credit this repository. A sufficient credit is the name "smart-tts-caching" and a link to https://github.com/adimyth/smart-tts-caching, placed in your documentation, on an about page, or wherever you list third-party software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

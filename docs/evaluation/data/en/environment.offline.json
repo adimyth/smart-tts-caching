@@ -1,0 +1,100 @@
+{
+ "frozen_at": "2026-10-20T02:57:00+0530",
+ "commit": "f4a74fb419398e8837632f0c1bdbfa269295c265",
+ "dirty_files": [
+  "README.md",
+  "harness/live_bench.py",
+  "packages/tts-cache/src/tts_cache/bench.py",
+  "packages/tts-cache/src/tts_cache/corpus.py",
+  "packages/tts-cache/src/tts_cache/match/near.py",
+  "packages/tts-cache/src/tts_cache/testplan/cells.py",
+  "packages/tts-cache/tests/fixtures/near/as.yaml",
+  "packages/tts-cache/tests/fixtures/near/bn.yaml",
+  "packages/tts-cache/tests/fixtures/near/en.yaml",
+  "packages/tts-cache/tests/fixtures/near/gu.yaml",
+  "packages/tts-cache/tests/fixtures/near/hi.yaml",
+  "packages/tts-cache/tests/fixtures/near/kn.yaml",
+  "packages/tts-cache/tests/fixtures/near/ml.yaml",
+  "packages/tts-cache/tests/fixtures/near/mr.yaml",
+  "packages/tts-cache/tests/fixtures/near/or.yaml",
+  "packages/tts-cache/tests/fixtures/near/pa.yaml",
+  "packages/tts-cache/tests/fixtures/near/ta.yaml",
+  "packages/tts-cache/tests/fixtures/near/te.yaml",
+  "packages/tts-cache/tests/test_near.py"
+ ],
+ "untracked": [
+  "TEST_PLAN_CORE.md",
+  "packages/tts-cache/src/tts_cache/testplan/core.py"
+ ],
+ "diff_sha256": "ea42d6361ffeccf71fca47838c76ff671520845454f9490e7f0a77822607fd28",
+ "versions": {
+  "python": "3.12.13",
+  "tts-cache": "0.1.0",
+  "tts-cache-pipecat": "0.1.0",
+  "pipecat-ai": "1.12.1.dev500",
+  "redis": "8.1.0",
+  "onnxruntime": "1.24.4",
+  "redis_server_6380": "7.0.11"
+ },
+ "machine": {
+  "platform": "macOS-15.7.5-arm64-arm-64bit",
+  "cpu": "arm",
+  "cores": 12,
+  "ram_gb": 48
+ },
+ "network": "home connection; the provider region is the provider's default",
+ "deployment": {
+  "language": "en",
+  "service": "elevenlabs_ws_fc",
+  "provider": "elevenlabs",
+  "transport": "websocket",
+  "scope": {
+   "service": "elevenlabs",
+   "model": "eleven_flash_v2_5",
+   "voice": "txk8uOzZ0iCh0B9mFSRG",
+   "language": "en-IN",
+   "sample_rate": 24000,
+   "channels": 1,
+   "settings": {
+    "language": "en"
+   },
+   "schema_version": 1,
+   "generation": 0
+  }
+ },
+ "store": "local Redis on the same machine (no network hop); TieredStore deadline 20 ms",
+ "policies": {
+  "A+B": "DEFAULT_POLICY: Probation(48h, 30d), MinChars(3, 400), LevelB({punctuation, filler}); a question mark added or removed is class 'question', never served",
+  "A+B+C+J": "LEVEL_C_POLICY with default_matcher(judge=True): mDeBERTa NLI judge, two-way entailment >= 0.70, after the slot and span vetoes",
+  "skip_patterns_evaluated": [
+   "\\d{4,}",
+   "\\d[\\d -]{8,}\\d",
+   "[\\w.+-]+@[\\w-]+\\.[\\w.]+",
+   "(?i)\\b(otp|pin|cvv|password|passcode)\\b"
+  ]
+ },
+ "inputs": {
+  "safety": "harness/corpus/<lang>.yaml bases with rule-made and authored decoys, three stored forms, plus tests/fixtures/{semantic,near,judge}",
+  "replay": "no production log exists: the synthetic labelled corpus at r = 0.25 and 0.5, seeds 1-10 (an assumption, not a forecast)",
+  "low_repeat_control": "every base once (r = 0), seeds 1-10"
+ },
+ "price": {
+  "date": "2026-10-18",
+  "usd_per_million_chars": 50.0,
+  "note": "eleven_flash_v2_5: $0.05 per 1,000 characters pay-as-you-go"
+ },
+ "latency_budget": {
+  "miss_overhead_p95_ms": 20.0,
+  "miss_overhead_note": "cache work on a miss, plus audio decode on a hit",
+  "l1_p50_improvement_target_ms": 100.0
+ },
+ "volume_assumption": {
+  "calls_per_month": [
+   10000,
+   100000,
+   1000000
+  ],
+  "sentences_per_call": 20,
+  "note": "the adopter's volume is unknown: scenarios, labelled as assumptions"
+ }
+}

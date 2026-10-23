@@ -36,7 +36,7 @@ CORE_RUNS = (
     ("A+B+C", 0.5),
 )
 SPREAD_RUNS = (("OFF", 0.5), ("A+B+C", 0.5))
-# TEST_PLAN_CORE.md: one cell per frozen deployment, the low-repeat control (r = 0) beside the replay,
+# docs/evaluation/PLAN.md: one cell per frozen deployment, the low-repeat control (r = 0) beside the replay,
 # and one A+B run that takes the Redis faults of 4.5 on its own.
 CORE_PLAN = {"en": "elevenlabs_ws_fc", "hi": "sarvam_ws_flush"}
 # A+B+C+J failed the offline safety gate of 4.1 and is not run live (section 5, step 2).
@@ -104,7 +104,7 @@ def live_runs(langs: tuple[str, ...] | list[str]) -> list[LiveRun]:
 
 
 def core_plan_runs(langs: tuple[str, ...] | list[str], *, fault: bool = False) -> list[LiveRun]:
-    """The live runs of TEST_PLAN_CORE.md; with ``fault``, only the run the Redis faults hit."""
+    """The live runs of docs/evaluation/PLAN.md; with ``fault``, only the run the Redis faults hit."""
     runs = []
     for lang in langs:
         if lang not in CORE_PLAN:

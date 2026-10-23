@@ -1720,7 +1720,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--fake", action="store_true", help="FakeTTSService in place of every provider (rehearsal)")
         p.add_argument("--drop", default="", help="comma list of lang/service cells dropped at preflight")
         p.add_argument(
-            "--plan", choices=("full", "core", "core-fault"), default="full", help="TEST_PLAN.md or TEST_PLAN_CORE.md"
+            "--plan", choices=("full", "core", "core-fault"), default="full", help="the full plan or docs/evaluation/PLAN.md"
         )
     run_p = sub.choices["run"]
     run_p.add_argument("--max-chars", type=int, help="refuse to start when the worst case exceeds this")

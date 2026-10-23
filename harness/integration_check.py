@@ -1,4 +1,4 @@
-"""TEST_PLAN_CORE.md 4.6: the README wiring on a stock Pipecat pipeline with a live service and Redis.
+"""docs/evaluation/PLAN.md 4.6: the README wiring on a stock Pipecat pipeline with a live service and Redis.
 
 A bot without a transport: the LLM's output is streamed into the pipeline as
 text frames, as an LLM service would push them. The same sentence is spoken

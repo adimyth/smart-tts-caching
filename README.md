@@ -1,4 +1,4 @@
-# tts-cache
+# Smart TTS Caching for Voice Agents
 
 **A sentence-level audio cache for Pipecat voice agents.** When an agent is about to say a sentence it has already said in the same voice, the cache plays the stored audio instead of calling the TTS provider: the sentence is not billed, and it starts playing in milliseconds.
 
@@ -6,17 +6,32 @@
 ![Pipecat 1.12.x](https://img.shields.io/badge/pipecat--ai-1.12.x-6366f1)
 ![Status: alpha](https://img.shields.io/badge/status-alpha-orange)
 
-- [Why](#why)
-- [Features](#features)
-- [How it works](#how-it-works)
-- [Results](#results)
-- [Installation](#installation)
-- [Quick start](#quick-start)
-- [Configuration](#configuration)
-- [Command line](#command-line)
-- [Operations](#operations)
-- [Guarantees and limitations](#guarantees-and-limitations)
-- [Development](#development)
+- [Smart TTS Caching for Voice Agents](#smart-tts-caching-for-voice-agents)
+  - [Why](#why)
+  - [Features](#features)
+  - [How it works](#how-it-works)
+    - [Match levels](#match-levels)
+  - [Results](#results)
+    - [Correctness](#correctness)
+    - [Hit rate](#hit-rate)
+    - [Latency](#latency)
+    - [Cost](#cost)
+  - [Installation](#installation)
+  - [Quick start](#quick-start)
+    - [1. Estimate the hit rate](#1-estimate-the-hit-rate)
+    - [2. Wire it into Pipecat](#2-wire-it-into-pipecat)
+    - [3. Check it](#3-check-it)
+    - [Supported services](#supported-services)
+  - [Configuration](#configuration)
+    - [Stores](#stores)
+    - [Policies](#policies)
+    - [Level C (experimental)](#level-c-experimental)
+  - [Operations](#operations)
+  - [Guarantees and limitations](#guarantees-and-limitations)
+    - [Guarantees](#guarantees)
+    - [Known limitations](#known-limitations)
+  - [License](#license)
+  - [Design](#design)
 
 ## Why
 
@@ -30,7 +45,7 @@ A voice agent sends every sentence it speaks to a TTS provider. Each request is 
 - **Fails open.** Every store call has a 20 ms deadline. A slow, failing or unreachable store turns the sentence into an ordinary provider request, and no cache error reaches the pipeline.
 - **Shared and fast.** Redis is shared by all sessions, and each process keeps its most-used clips in memory, loaded at start, so a fresh container hits from its first sentence.
 - **Multilingual.** Canonicalisation and near-duplicate matching cover English and eleven Indian languages: Hindi, Bengali, Assamese, Punjabi, Gujarati, Marathi, Odia, Tamil, Telugu, Kannada and Malayalam. Exact matching works in any language.
-- **Policies.** Retention, minimum length, skip patterns for personal data, turn position, per-tenant isolation, write rate limits and per-tag routing, composable.
+- **Policies.** Rules for which sentences are stored, how long a clip lives, and which near-duplicates may play. You can skip personal data, keep each tenant's audio separate, or cache only the opening and closing sentence of a turn.
 - **Operable.** Estimate the hit rate from your own transcripts before deploying, warm a new deployment, check Redis placement, purge by tag or text, and export metrics as JSON lines or Pipecat `MetricsFrame`s.
 
 ## How it works
@@ -38,36 +53,38 @@ A voice agent sends every sentence it speaks to a TTS provider. Each request is 
 ![System overview](docs/diagrams/overview.svg)
 
 1. The LLM's output is split into sentences, the unit a provider synthesises in one request.
-2. Each sentence is keyed on its canonical text, taken after Pipecat's own text filters and transforms, plus the scope: everything that shapes the sound.
+2. Each sentence is keyed on its canonical text, taken after Pipecat's own text filters and transforms, plus the scope: the provider, TTS model, voice, language, sample rate and audio settings. Both have to match before a stored clip can play.
 3. The key is looked up in the shared store. On a hit, the stored audio plays in the sentence's place and the provider is skipped. On a miss, the provider synthesises as usual, and the clip is captured, checked and stored for next time.
 
-Canonicalisation folds differences that cannot change the audio: Unicode normalisation, Indic nukta and joiner variants, native digits, danda against full stop, whitespace, markdown and case.
+Before the lookup, the sentence is rewritten to one spelling. Case, extra spaces and markdown are folded in, and so are characters a provider speaks the same way: the digits १२३ and 123, or the Hindi stop । and a full stop.
 
 ### Match levels
 
 Each level runs only when the previous one misses.
 
+A **slot** is a fact inside the sentence: a name, a number, a date, an amount, or a product. In "Your refund of ₹2,349 will reach you by Thursday" the amount and the day are slots. A stored clip never plays when a slot differs, because the caller would hear the wrong fact.
+
 | Level | Serves | Status | How it decides |
 |---|---|---|---|
 | **A**, exact | The same canonical text | On by default | Hash lookup |
-| **B**, near duplicate | The same words, differing only in punctuation or leading and trailing filler | On by default | MinHash candidates, an edit-distance check and a diff classifier; a difference in a name, number, date, amount, negation or question mark is never served |
-| **C**, paraphrase | The same meaning in different words | Experimental, off | A multilingual encoder (`multilingual-e5-small`) proposes the nearest stored sentence, slot and span vetoes refuse changed facts, and an NLI judge (mDeBERTa-v3-base) must find that each sentence entails the other |
+| **B**, near duplicate | The same words, differing only in punctuation or leading and trailing filler | On by default | MinHash candidates, an edit-distance check and a diff classifier. A changed slot, a negation, or a question mark is never served |
+| **C**, paraphrase | The same meaning in different words | Experimental, off | A multilingual encoder (`multilingual-e5-small`) proposes the nearest stored sentence. The slot veto compares the facts and refuses the candidate when they differ. The span veto refuses a candidate whose only difference is one short stretch, such as a name swapped for another name, or a "not" added or dropped. An entailment model (`mDeBERTa-v3-base`) must then find that each sentence entails the other |
 
 > [!WARNING]
-> Level C is not safe for production. On an adversarial corpus it played statements for questions (289 of 421 English pairs) and served real changes of meaning: asked for "My colleague Tanvi will not follow up with you by Thursday", it played "You will hear back from my colleague Tanvi no later than Thursday". Keep it off.
+> Level C is not safe for production. On an adversarial corpus it played statements for questions (289 of 421 English pairs) and served real changes of meaning: asked for "My colleague Tanvi will not follow up with you by Thursday", it played "You will hear back from my colleague Tanvi no later than Thursday".
 
 ## Results
 
-Measured on an Apple M4 Pro with a local Redis. Offline runs drive the cache's own code with a stand-in provider over labelled corpora in 12 languages. Live runs use ElevenLabs (`eleven_flash_v2_5` over websocket, English) and Sarvam (`bulbul:v4-flash` over websocket, Hindi). A+B, the default configuration, means Levels A and B.
+The full evaluation is in [docs/evaluation](docs/evaluation/REPORT.md): the [plan](docs/evaluation/PLAN.md), the [report](docs/evaluation/REPORT.md), and the frozen environment and live summary the numbers come from. Measured on an Apple M4 Pro with a local Redis. Offline runs drive the cache's own code with a stand-in provider over labelled corpora in 12 languages. Live runs use ElevenLabs (`eleven_flash_v2_5` over websocket, English) and Sarvam (`bulbul:v4-flash` over websocket, Hindi). A+B, the default configuration, means Levels A and B.
 
 ### Correctness
 
-| Check | Result |
-|---|---|
-| Offline matrix: 12 languages, 2,040 runs, Levels A and A+B | No clip with a different meaning served |
-| Adversarial corpus, English and Hindi: at least 420 requests per decoy kind (new sentence, changed slot, changed meaning, question for statement) | 0 of 2,649 and 0 of 2,659 served; upper 95 % bound under 0.72 % for each kind |
-| Scope isolation: voice, model, language, sample rate, channels, one setting or tenant changed | 0 of 560 requests served for each field |
-| Live, both providers | 0 wrong serves; provider requests equal misses |
+| Check | Result | Why this is good |
+|---|---|---|
+| Offline matrix: 12 languages, 2,040 runs, Levels A and A+B | No clip with a different meaning served | Every clip that played said what the agent had asked for |
+| Adversarial corpus, English and Hindi: at least 420 requests per kind (a new sentence, a changed slot, a changed meaning, a question offered a statement's audio) | 0 of 2,649 English requests and 0 of 2,659 Hindi requests served. Upper 95% bound under 0.72% for each kind | The cache refused sentences it had never stored, sentences whose name, number, date or amount had changed, sentences whose meaning had changed, and questions paired with a statement |
+| Scope isolation: voice, model, language, sample rate, channels, one audio setting, or tenant changed | 0 of 560 requests served for each field | Audio recorded for one voice, model, language or tenant stayed with that voice, model, language or tenant |
+| Live, both providers | 0 wrong serves. Provider requests equal misses | Every sentence missing from the cache went to ElevenLabs or Sarvam, and every clip that played matched its sentence |
 
 ### Hit rate
 
@@ -78,33 +95,35 @@ The character-weighted hit rate is the share of characters served from the cache
 | Level A | 15.4 to 16.9 % | 29.9 to 31.3 % |
 | Levels A + B (default) | 19.9 to 21.5 % | 38.7 to 40.2 % |
 
-Live at r = 0.5, provider characters fell by 38.6 % on ElevenLabs and 35.5 % on Sarvam. The corpora are synthetic, so [estimate your own hit rate](#1-estimate-the-hit-rate) from real transcripts before relying on these numbers.
+The corpora are synthetic, so [estimate your own hit rate](#1-estimate-the-hit-rate) from real transcripts before relying on these numbers.
 
 ### Latency
 
-| Measure | Result |
-|---|---|
-| Provider, first audio of a sentence (live, six service classes) | 131 ms to 2.4 s |
-| Cache hit, first audio of a turn's first sentence (live) | 7.7 ms p50 on ElevenLabs, 8.7 ms on Sarvam |
-| Cache work on a miss (live) | 0.8 to 1.4 ms p50, 2.4 ms p95 |
-| Turn start, with a third of turns opening on a hit (live) | 60 ms sooner on average on ElevenLabs, 54 ms on Sarvam |
-| Redis paused for 5 s, then restarted (live) | No error reached the pipeline; the cache's added time peaked at 23 ms |
+Latency here is the wait from the moment a sentence is ready to speak until its first audio frame. p50 is the median and p95 is the slow end. The provider row covers live calls to the six service classes, one provider on one transport: OpenAI over REST, ElevenLabs over REST, ElevenLabs over a multi-context websocket, ElevenLabs Text-to-Dialogue over a websocket, Sarvam over REST, and Sarvam over a websocket. The class to wire for each is under [Supported services](#supported-services). The other rows are the live ElevenLabs (`eleven_flash_v2_5`, English) and Sarvam (`bulbul:v4-flash`, Hindi) websocket runs.
+
+| What we measured | Result | What it means |
+|---|---|---|
+| Time until the provider returns the first audio of a sentence, across the six service classes | 131 ms to 2.4 s | This is the wait on a miss. ElevenLabs Text-to-Dialogue over websocket was 131 ms. Sarvam over REST, in Hindi, was 2.4 s |
+| Time until the first audio of a turn, when that opening sentence is a cache hit | 7.7 ms p50 on ElevenLabs, 8.7 ms p50 on Sarvam | The caller hears the start of the turn from the cache. The opening sentence is the one that matters: a later sentence waits until the previous sentence has finished playing, so its clock includes playback |
+| Time the cache spends on a miss, before the provider is called | 0.8 to 1.4 ms p50, 2.4 ms p95 | A miss still goes to the provider. The lookup in front of that call is about a millisecond |
+| How much sooner a turn starts when a third of turns open on a hit | 60 ms sooner on average on ElevenLabs, 54 ms on Sarvam | One turn in three starts from the cache and the rest wait on the provider. Those cached openings pull the average start time forward by about 60 ms |
+| Redis paused for 5 s, then restarted | No error reached the pipeline. The cache's added time peaked at 23 ms | A store that is down becomes an ordinary provider request, inside the 20 ms deadline |
 
 ### Cost
 
-The saving is the hit rate times the characters sent times the provider's price. At public list prices of October 2026, per million characters the agent would otherwise send:
+The saving is the hit rate times the characters sent times the provider's price. The figures below are estimated on our synthetic test corpora, at public list prices of October 2026, per million characters the agent would otherwise send:
 
 | Provider and model | Price per 1M characters | Saved at r = 0.25 | Saved at r = 0.5 |
 |---|---|---|---|
 | ElevenLabs `eleven_flash_v2_5` | $50 | ~$10 | ~$20 |
-| Sarvam `bulbul:v4-flash` | ~$24 (₹2,000) | ~$5 | ~$9 |
-| OpenAI `gpt-4o-mini-tts` | ~$16, all in | ~$3 | ~$6 |
+| Sarvam `bulbul:v4-flash` | ~$24 | ~$5 | ~$9 |
+| OpenAI `gpt-4o-mini-tts` | ~$16 | ~$3 | ~$6 |
 
 Against a managed Redis at ElastiCache Serverless list prices, and at 100,000 calls a month or more, the cache pays for itself above a character hit rate of about 7 % on ElevenLabs with Valkey and about 20 % on Sarvam with Redis OSS. A process with the cache uses about 100 MB more memory.
 
 ## Installation
 
-Requirements: Python 3.12, `pipecat-ai` 1.12.x, and, for a store shared across processes, Redis (tested with 7.0) or another Redis-protocol server such as Valkey. The packages are not published to PyPI; install them from a checkout:
+Requirements: Python 3.12; `pipecat-ai` 1.12.x, verified against commit `1d1385b6d` of [pipecat-ai/pipecat](https://github.com/pipecat-ai/pipecat), which is the checkout CI installs; and, for a store shared across processes, Redis (tested with 7.0) or another Redis-protocol server such as Valkey. The packages are not published to PyPI yet. Install them from a checkout of this repository:
 
 ```bash
 pip install "./packages/tts-cache[redis,similarity]" ./packages/tts-cache-pipecat
@@ -115,7 +134,10 @@ pip install "./packages/tts-cache[redis,similarity]" ./packages/tts-cache-pipeca
 | `tts-cache` | The framework-free core: splitting, canonicalisation, keys, matching, stores, policies, metrics and the `tts-cache` command |
 | `tts-cache[redis]` | `RedisStore` |
 | `tts-cache[similarity]` | Levels B and C; without it the cache runs Level A only |
-| `tts-cache-pipecat` | `TTSCacheRead`, `TTSCacheWrite` and the websocket service subclasses, for `pipecat-ai>=1.12,<1.13` |
+| `tts-cache-pipecat` | The Pipecat adapter, for `pipecat-ai>=1.12,<1.13` |
+
+> [!NOTE]
+> `tts-cache` is the cache. It does not import Pipecat, so estimates and tests can run without a pipeline. `tts-cache-pipecat` is the adapter for a Pipecat pipeline on `pipecat-ai` 1.12.x. It provides `TTSCacheRead` and `TTSCacheWrite`, the two processors placed around the TTS service, and the websocket subclasses for ElevenLabs and Sarvam. A subclass closes each sentence's server-side context, which is how the cache knows which audio belongs to which sentence. REST services use Pipecat's own classes.
 
 ## Quick start
 
@@ -130,10 +152,14 @@ tts-cache replay --log transcripts.jsonl --out replay.json
 The log has one JSON object per line:
 
 ```json
-{"ts": 1792300000.0, "session": "s-0001", "text": "Hello. How can I help?", "language": "en-US", "scope": "elevenlabs/flash/voice-1"}
+{"ts": 1792300000.0, "session": "s-0001", "text": "Hello. How can I help?", "language": "en-US", "scope": "elevenlabs/eleven_flash_v2_5/your-voice-id"}
 ```
 
-`text` can be one sentence or a whole turn. `scope` labels a voice identity: only sentences with the same label share audio. The report gives the hit rate the cache would have had and the rules that produced it.
+`text` can be one sentence or a whole turn. `scope` is a label you choose for one text-to-speech voice. Give the same label to every line spoken by the same provider, TTS model and voice, because only those lines are allowed to share audio. In the example, `elevenlabs` is the provider, `eleven_flash_v2_5` is the TTS model from the cost table, and `your-voice-id` stands in for the voice id in the ElevenLabs voice settings, the same id you pass to the TTS service. A second voice gets a second label. This string is only for the replay log.
+
+In the pipeline you do not write it. `scope_from_service` reads the provider, the TTS model, the voice id, the language, the sample rate and the audio settings off the service, and those fields become the key. The model in both places is the text-to-speech model, the one that speaks the sentence.
+
+The report gives the hit rate the cache would have had and the rules that produced it.
 
 ### 2. Wire it into Pipecat
 
@@ -167,19 +193,15 @@ pipeline = Pipeline([
 
 Always build the scope with `scope_from_service`, so the key names the voice the service really uses. Call `await cache.close()` on shutdown to flush pending captures.
 
-[`examples/wiring.py`](examples/wiring.py) runs the same wiring against a fake service, with no provider or credentials:
-
-```bash
-python examples/wiring.py   # {'first_run_provider_requests': 2, 'second_run_provider_requests': 0}
-```
-
 ### 3. Check it
 
 Say the same sentence in two turns. The second must make no provider request (Pipecat's `on_tts_request` event does not fire) and must still play. [`harness/integration_check.py`](harness/integration_check.py) runs this check against a live ElevenLabs or Sarvam service and Redis.
 
 ### Supported services
 
-Websocket services need the `tts_cache_pipecat` subclass, which closes each sentence's server-side context so its audio can be attributed to it.
+A service class is one provider on one transport. These six are the classes the latency numbers cover.
+
+Websocket classes come from `tts-cache-pipecat` and close each sentence's server-side context, so its audio can be stored against that sentence. REST classes are Pipecat's own.
 
 | Provider | Transport | Class to wire |
 |---|---|---|
@@ -203,21 +225,23 @@ Websocket services need the `tts_cache_pipecat` subclass, which closes each sent
 
 ### Policies
 
-A policy decides what is looked up, what is stored, for how long, and which match levels may serve. Combine policies with `AllOf` and `AnyOf`.
+A policy is the set of rules you pass to `TTSCache`. It answers four questions for each sentence: look it up or skip it, store the clip or drop it, how long the clip lives, and which match levels may play it.
 
-| Policy | Effect |
+You pass one policy object. `AllOf` stacks rules so that every rule has to agree: the quick start uses `AllOf(DEFAULT_POLICY, SkipIfMatches(...))`, which is the default rules plus a refusal to store long numbers. `AnyOf` looks up or stores when any one of its rules agrees.
+
+Some rules read tags. A tag is a label you attach on the read processor, as in `TTSCacheRead(cache, tts=tts, tags={"tenant": "acme"})`. The tag is stored with the clip, and a purge or a routing rule can select on it.
+
+| Policy | What it does |
 |---|---|
-| `DEFAULT_POLICY` | `Probation("48h", "30d")`, `MinChars(3, 400)`, and Level B for punctuation and filler |
-| `BASE_POLICY` | The same without Level B: exact matches only |
-| `SkipIfMatches(patterns)` | Never store a sentence matching any of the regular expressions; use it for personal or variable data |
-| `TurnPosition(first_n=1, last_n=1)` | Cache only the first and last sentences of each turn |
-| `SpeakFramesOnly()` | Cache only scripted `TTSSpeakFrame` utterances, never LLM output |
-| `Namespace(tag)` | Fold a tag's value, such as a tenant, into the key; clips are shared only within one value, and only exact matches serve |
-| `RateLimit(stores_per_minute)` | Bound the write rate |
-| `ByTag(tag, routes, default)` | A different policy for each value of a tag |
-| `Shadow(policy)` | Look up and record would-be hits, but always call the provider |
-
-Tags are passed on the read processor, as in `TTSCacheRead(cache, tts=tts, tags={"tenant": "acme"})`, and stored with each clip for purges and routing.
+| `DEFAULT_POLICY` | The starting rules. A new clip lives 48 hours. The first time it plays again, it lives 30 days, and each later play renews that 30 days. Sentences under 3 characters or over 400 are skipped. A near-duplicate may play when the only difference is punctuation or a leading or trailing filler |
+| `BASE_POLICY` | The same retention and length rules, with exact matches only |
+| `SkipIfMatches(patterns)` | Speaks the sentence and refuses to store it when the text matches any of the regular expressions. Use it for account numbers, card numbers and similar personal data. It catches the patterns you list. Names need something else, because no regular expression catches them |
+| `TurnPosition(first_n=1, last_n=1)` | Looks up and stores only the first `first_n` sentences and the last `last_n` sentences of a turn. The defaults keep the opening and the closing |
+| `SpeakFramesOnly()` | Caches lines the application sends with `TTSSpeakFrame`. Sentences the LLM writes go to the provider and are not stored |
+| `Namespace(tag)` | Puts the tag's value into the cache key. A clip stored for tenant `acme` plays only on later requests whose `tenant` tag is `acme` |
+| `RateLimit(stores_per_minute)` | Caps how many new clips are written per minute. Lookups continue past the cap |
+| `ByTag(tag, routes, default)` | Picks the policy for that tag's value. A value with no entry uses `default` |
+| `Shadow(policy)` | Stores clips and counts the hits, and still calls the provider for every sentence. Use it to watch the hit rate on live traffic before cached audio is served |
 
 ### Level C (experimental)
 
@@ -229,16 +253,6 @@ cache = TTSCache(scope, store, policy=LEVEL_C_POLICY, matcher=default_matcher(ju
 ```
 
 The judge loads a 1.1 GB model at construction, downloaded from the Hugging Face Hub on first use. It adds about 3.2 GB of memory per process and 20 to 40 ms to every sentence that Levels A and B miss. When it serves, the stored sentence replaces the LLM's text in the transcript. See the warning under [Match levels](#match-levels) before enabling it.
-
-## Command line
-
-| Command | Purpose |
-|---|---|
-| `tts-cache replay --log FILE [--policy SPEC] [--out FILE]` | The hit rate a transcript log would have had |
-| `tts-cache warm --from replay.json --scope scope.json --store URL --provider module:factory` | Synthesise a replay's most frequent sentences once and store them under the deployment's keys |
-| `tts-cache ping --url redis://HOST:6379/0` | The Redis round trip, against the 10 ms p99 placement rule |
-| `tts-cache bench [--r 0,0.25,0.5] [--out DIR]` | Synthetic cost and latency benchmark of the core |
-| `tts-cache-pipecat bench [--r 0,0.5]` | The same benchmark through a real Pipecat pipeline |
 
 ## Operations
 
@@ -284,34 +298,10 @@ A purge clears Redis and the calling process at once. Other running processes ke
 - **Pipelines without a transport.** Pipecat's websocket services pause after each turn until `transport.output()` sends `BotStoppedSpeakingFrame` upstream. A test pipeline without a transport must send it itself, or nothing after the first turn plays.
 - **Limited live evidence.** The live results cover one voice each on ElevenLabs and Sarvam, a local Redis and synthetic traffic.
 
-## Development
+## License
 
-Prerequisites: [uv](https://docs.astral.sh/uv/), Python 3.12, a Pipecat checkout at `../pipecat` (the workspace pins it as an editable dependency at commit `1d1385b6d`), and `redis-server` for the Redis tests.
+Using this software requires credit to this repository. A sufficient credit is the name `smart-tts-caching` and a link to <https://github.com/adimyth/smart-tts-caching>, in your documentation or wherever you list third-party software. The terms are in [LICENSE](LICENSE).
 
-```bash
-uv sync                           # create .venv with both packages, editable
-make lint                         # ruff check, ruff format --check, pyright
-make test                         # unit and pipeline tests
-make redis-up && make test-redis  # plus the Redis suite on port 6380
-make format                       # apply ruff formatting and fixes
-```
-
-The live harness calls real providers. It reads `ELEVENLABS_TTS_KEY`, `ELEVENLABS_VOICE_ID`, `SARVAM_API_KEY`, `SARVAM_TTS_MODEL`, `SARVAM_TTS_SPEKAER` and `OPENAI_API_KEY` from a `.env` file:
-
-```bash
-make harness SERVICE=all                    # per-sentence audio attribution for each service class
-python harness/integration_check.py en      # the wiring above, against ElevenLabs and Redis
-python harness/live_bench.py plan           # the live runs and their budget, without calling a provider
-python -m tts_cache.testplan.core --help    # the stages of the core evaluation
-```
-
-```text
-packages/tts-cache/            the core library and the tts-cache command
-packages/tts-cache-pipecat/    the Pipecat processors and service subclasses
-harness/                       live provider harnesses and corpora
-examples/wiring.py             the wiring above, runnable without credentials
-docs/diagrams/                 the design diagrams; generate.py rebuilds them
-SOLUTION.md                    the full design
-```
+## Design
 
 The design, with the reasoning behind each decision, is in [SOLUTION.md](SOLUTION.md).

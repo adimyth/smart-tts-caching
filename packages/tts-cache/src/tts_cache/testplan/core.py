@@ -1,4 +1,4 @@
-"""The offline stages of TEST_PLAN_CORE.md for the frozen deployments.
+"""The offline stages of docs/evaluation/PLAN.md for the frozen deployments.
 
     python -m tts_cache.testplan.core freeze --out harness/out/core/<id>
     python -m tts_cache.testplan.core safety --out harness/out/core/<id>
@@ -102,13 +102,13 @@ DEPLOYMENTS: dict[str, dict[str, Any]] = {
     },
 }
 
-# The miss budget and turn-start target, stated before the run (TEST_PLAN_CORE.md 4.3).
+# The miss budget and turn-start target, stated before the run (docs/evaluation/PLAN.md 4.3).
 MISS_BUDGET_MS = 20.0
 L1_TARGET_MS = 100.0
 CALLS_PER_MONTH = (10_000, 100_000, 1_000_000)
 SENTENCES_PER_CALL = 20
 
-# A deployment's skip list for sentences that carry an identifier (TEST_PLAN_CORE.md 4.7): runs of
+# A deployment's skip list for sentences that carry an identifier (docs/evaluation/PLAN.md 4.7): runs of
 # four or more digits in any script, phone and card numbers, e-mail addresses, one-time codes.
 PII_PATTERNS = (
     r"\d{4,}",
