@@ -191,7 +191,7 @@
   function selectCall(id) {
     call = config.calls.find(c => c.id === id);
     lineIndex = 0;
-    $('pCallerName').textContent = call.caller; $('pCaller').querySelector('.avatar').textContent = call.caller[0];
+    $('pCallerName').textContent = call.caller.split(' ')[0]; $('pCaller').querySelector('.avatar').textContent = call.caller[0];
     renderLines();
   }
 

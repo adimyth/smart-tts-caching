@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-HOSPITAL = "Nirmaya Multispeciality Hospital"
+HOSPITAL = "City General Hospital"
 AGENT = "Ananya"
 LANGUAGE = os.environ.get("DEMO_LANG", "hi")  # the cache scope and the edition
 LANGUAGE_NAME = {"hi": "Hinglish", "en": "English"}
@@ -27,7 +27,7 @@ LANGUAGE_NAME = {"hi": "Hinglish", "en": "English"}
 # Sarvam bulbul:v4-flash speakers per edition.
 VOICES = {
     "hi": {"agent": "ishita_enhi_customer", "caller": "shubh_enhi_companion", "code": "hi-IN"},
-    "en": {"agent": "neha_en_customer", "caller": "dev_en_conversational", "code": "en-IN"},
+    "en": {"agent": "ishita_enhi_customer", "caller": "shubh_enhi_companion", "code": "en-IN"},
 }
 AGENT_VOICE = VOICES[LANGUAGE]["agent"]
 CALLER_VOICE = VOICES[LANGUAGE]["caller"]
@@ -38,7 +38,7 @@ TTS_LANGUAGE_CODE = VOICES[LANGUAGE]["code"]
 # ---------------------------------------------------------------------------
 
 RECORDS = {
-    "9820012345": {"name": "Rohan Deshmukh", "patient_id": "NMH-2019-4471", "upcoming": None},
+    "9820012345": {"name": "Rohan Deshmukh", "patient_id": "CGH-2019-4471", "upcoming": None},
 }
 
 AVAILABILITY = {
