@@ -1086,7 +1086,7 @@ requires-dist = [
     { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.13" },
     { name = "pygobject", marker = "extra == 'gstreamer'", specifier = ">=3.52.0,<4" },
     { name = "pyjwt", marker = "extra == 'livekit'", specifier = ">=2.12.0,<3" },
-    { name = "pyrnnoise", marker = "extra == 'rnnoise'", specifier = "==0.4.3" },
+    { name = "pyrnnoise", marker = "extra == 'rnnoise'", specifier = "~=0.4.5" },
     { name = "python-dotenv", specifier = ">=1.0.0,<2.0.0" },
     { name = "pyvips", extras = ["binary"], marker = "extra == 'moondream'", specifier = ">=3.0.0,<4" },
     { name = "pyyaml", specifier = ">=6,<7" },
