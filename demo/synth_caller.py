@@ -1,7 +1,7 @@
 """Pre-synthesise the caller's lines with Sarvam bulbul:v4-flash, one mp3 per line.
 
 The caller page plays these into the call, so every take says the same words in the same voice.
-Files land in ``demo/static/caller/<call id>/<n>.mp3`` with a ``manifest.json`` beside them, and a
+Files land in ``demo/static/caller/<edition>/<call id>/<n>.mp3`` with a ``manifest.json`` beside them, and a
 line that already has its file is skipped.
 
     .venv/bin/python demo/synth_caller.py            # every call

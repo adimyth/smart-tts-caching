@@ -6,7 +6,21 @@
 ![Pipecat 1.12.x](https://img.shields.io/badge/pipecat--ai-1.12.x-6366f1)
 ![Status: alpha](https://img.shields.io/badge/status-alpha-orange)
 
+## Try it
+
+Watch the launch video, in [English](smart-tts-caching-en.mp4) or [Hinglish](smart-tts-caching-hi.mp4): two calls to a hospital's appointment desk, where the second call plays its repeated sentences from the cache and refuses the ones whose facts changed.
+
+Or talk to the agent yourself. On macOS or Linux:
+
+```bash
+git clone https://github.com/adimyth/smart-tts-caching.git && cd smart-tts-caching
+./demo/quickstart.sh
+```
+
+The script installs everything, starts Redis and the agent locally, asks for a Sarvam and an OpenAI key, and opens the call page in your browser. Press Connect and talk, hang up, then call again and say the same things: every sentence the agent repeats shows a HIT badge and starts in milliseconds. `./demo/quickstart.sh --mode scripted` replays the video's calls with a Sarvam key alone. The details are in [demo/README.md](demo/README.md).
+
 - [Smart TTS Caching for Voice Agents](#smart-tts-caching-for-voice-agents)
+  - [Try it](#try-it)
   - [Why](#why)
   - [Features](#features)
   - [How it works](#how-it-works)

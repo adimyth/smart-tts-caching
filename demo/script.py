@@ -1,6 +1,6 @@
 """The launch demo's conversation: persona, pinned lines, scripted turns, caller lines and expected outcomes.
 
-The agent is Ananya at the appointment desk of Nirmaya Multispeciality Hospital, Hinjewadi, Pune
+The agent is Ananya at the appointment desk of City General Hospital, Hinjewadi, Pune
 (a fictional hospital). Two inbound calls from the same caller: the first books an appointment
 and fills the cache; the second, next day, moves it, and lands on every match level and on every
 refusal. Two editions share the structure: ``hi``, the Hinglish a Pune desk really speaks, and
