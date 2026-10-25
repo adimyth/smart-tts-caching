@@ -6,21 +6,26 @@
 ![Pipecat 1.12.x](https://img.shields.io/badge/pipecat--ai-1.12.x-6366f1)
 ![Status: alpha](https://img.shields.io/badge/status-alpha-orange)
 
-## Try it
+## Try the demo
 
-Watch the launch video, in [English](smart-tts-caching-en.mp4) or [Hinglish](smart-tts-caching-hi.mp4): two calls to a hospital's appointment desk, where the second call plays its repeated sentences from the cache and refuses the ones whose facts changed.
-
-Or talk to the agent yourself. On macOS or Linux:
+Run a live call with the cache on your own machine. You need macOS or Linux, a microphone, a [Sarvam API key](https://dashboard.sarvam.ai) and an [OpenAI API key](https://platform.openai.com/api-keys).
 
 ```bash
-git clone https://github.com/adimyth/smart-tts-caching.git && cd smart-tts-caching
+git clone https://github.com/adimyth/smart-tts-caching.git
+cd smart-tts-caching
 ./demo/quickstart.sh
 ```
 
-The script installs everything, starts Redis and the agent locally, asks for a Sarvam and an OpenAI key, and opens the call page in your browser. Press Connect and talk, hang up, then call again and say the same things: every sentence the agent repeats shows a HIT badge and starts in milliseconds. `./demo/quickstart.sh --mode scripted` replays the video's calls with a Sarvam key alone. The details are in [demo/README.md](demo/README.md).
+1. The script installs what it needs, starts Redis and the agent locally, and asks for the two keys the first time, saving them to `.env`. The first run also downloads about 1.6 GB of models; `--no-level-c` skips them.
+2. The call page opens at http://127.0.0.1:7860. Press **Connect** and talk to Ananya, the appointment desk of a fictional hospital, who speaks Hinglish.
+3. Hang up, press **Connect** again and say the same things. Every sentence Ananya repeats now plays from the cache: it shows a HIT badge and starts in a few milliseconds.
+
+`--lang en` makes Ananya speak English, `--prompt my_prompt.txt` runs your own system prompt, and `--mode scripted` replays the two calls of the launch video with a Sarvam key alone. More options are in [demo/README.md](demo/README.md).
+
+To watch instead, the launch video is in [English](smart-tts-caching-en.mp4) and [Hinglish](smart-tts-caching-hi.mp4).
 
 - [Smart TTS Caching for Voice Agents](#smart-tts-caching-for-voice-agents)
-  - [Try it](#try-it)
+  - [Try the demo](#try-the-demo)
   - [Why](#why)
   - [Features](#features)
   - [How it works](#how-it-works)
@@ -154,6 +159,8 @@ pip install "./packages/tts-cache[redis,similarity]" ./packages/tts-cache-pipeca
 > `tts-cache` is the cache. It does not import Pipecat, so estimates and tests can run without a pipeline. `tts-cache-pipecat` is the adapter for a Pipecat pipeline on `pipecat-ai` 1.12.x. It provides `TTSCacheRead` and `TTSCacheWrite`, the two processors placed around the TTS service, and the websocket subclasses for ElevenLabs and Sarvam. A subclass closes each sentence's server-side context, which is how the cache knows which audio belongs to which sentence. REST services use Pipecat's own classes.
 
 ## Quick start
+
+To hear the cache on a live call first, run [the demo](#try-the-demo). The steps below add the cache to your own agent.
 
 ### 1. Estimate the hit rate
 
