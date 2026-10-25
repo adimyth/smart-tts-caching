@@ -306,11 +306,7 @@ A purge clears Redis and the calling process at once. Other running processes ke
 
 - **Level C is unsafe.** It serves statements for questions and some changes of meaning; see [Match levels](#match-levels).
 - **A purge reaches other processes only when they restart.** See [Deleting audio](#operations).
-- **Prosody seams.** Providers that condition a request on the previous one, such as ElevenLabs request stitching, give a live sentence context that a cached clip lacks, so the join in a mixed turn may be audible. No listening audit has been run. `TurnPosition()` limits caching to turn boundaries.
-- **Two wiring mistakes go unnoticed.** Without `TTSCacheWrite` nothing is ever stored, and no warning is given. A hand-built `Scope` naming another voice stores clips under that voice's key.
 - **Pipecat coupling.** The adapter relies on internal `TTSService` behaviour verified at `pipecat-ai` 1.12.x, commit `1d1385b6d`, and pins that minor version. After an upgrade, rerun `harness/attribution.py`. Undetected drift trips the key check and degrades to no cache, not to wrong audio.
-- **Pipelines without a transport.** Pipecat's websocket services pause after each turn until `transport.output()` sends `BotStoppedSpeakingFrame` upstream. A test pipeline without a transport must send it itself, or nothing after the first turn plays.
-- **Limited live evidence.** The live results cover one voice each on ElevenLabs and Sarvam, a local Redis and synthetic traffic.
 
 ## License
 
