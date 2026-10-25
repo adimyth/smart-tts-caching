@@ -1,3 +1,4 @@
+import pytest
 from fake_tts import FakeTTSService
 
 from tts_cache import MemoryStore, TTSCache
@@ -8,6 +9,7 @@ from tts_cache_pipecat.bench import run_pipecat
 from tts_cache_pipecat.warm import rest_provider
 
 
+@pytest.mark.slow  # a wall-clock budget: a local check, deselected in CI
 async def test_pipecat_host_bench(tmp_path) -> None:
     corpus = generate(16, 0.5, seed=2)
     off = await run_pipecat(corpus, 0.5, cache_on=False, ttfb_median_ms=5, ttfb_sigma=0.2, workdir=tmp_path)

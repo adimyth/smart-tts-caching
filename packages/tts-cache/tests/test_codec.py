@@ -104,6 +104,7 @@ def test_decode_stream_checks_rate() -> None:
         codec.PcmStream.decoding(data, "opus", 16_000, 1)
 
 
+@pytest.mark.slow  # a wall-clock budget: a local check, deselected in CI
 def test_opus_first_200_ms_under_1_ms_and_full_clip_under_15_ms() -> None:
     """The M1 codec gate, on a 4 s 24 kHz clip; median of 9 runs."""
     data = codec.encode(speechlike(), SR, 1, "opus")
