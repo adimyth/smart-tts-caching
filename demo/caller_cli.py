@@ -93,8 +93,11 @@ async def events(base: str, call_id: str, queue: asyncio.Queue[dict]) -> None:
 async def run(call_id: str, base: str, out: Path, pause_before: int | None, gap: float) -> int:
     call = CALLS_BY_ID[call_id]
     out.mkdir(parents=True, exist_ok=True)
+    # The agent's edition decides which caller recordings to play, as it does for the page.
+    async with httpx.AsyncClient() as client:
+        lang = (await client.get(f"{base}/api/config")).json()["language"]
     lines = [
-        decode_mp3(HERE / "static" / "caller" / call_id / f"{i}.mp3")
+        decode_mp3(HERE / "static" / "caller" / lang / call_id / f"{i}.mp3")
         for i in range(1, len(call.caller_lines) + 1)
     ]
 
