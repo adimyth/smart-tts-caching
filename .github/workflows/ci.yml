@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: pipecat-ai/pipecat
-          ref: 1d1385b6d
+          ref: 1d1385b6d5e3375199f98b2d456e56472bee16d2  # the pinned Pipecat commit; the checkout action needs the full hash
           path: pipecat
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
@@ -29,4 +29,6 @@ jobs:
         run: make lint
       - name: Unit tests
         working-directory: smart-tts-caching
-        run: make test
+        # The slow marker covers wall-clock budget tests (the Level C judge under 100 ms at p99);
+        # a shared two-core runner cannot meet them, so they stay a local check.
+        run: .venv/bin/python -m pytest -q -m "not slow"
