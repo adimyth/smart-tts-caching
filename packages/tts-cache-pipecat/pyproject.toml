@@ -1,19 +1,39 @@
 [project]
-name = "tts-cache-pipecat"
-version = "0.1.0"
-description = "Pipecat integration for tts-cache: read and write frame processors around a TTS service"
+name = "smart-tts-cache-pipecat"
+version = "0.2.0"
+description = "Pipecat integration for smart-tts-cache: read and write frame processors around a TTS service"
+readme = "README.md"
+license-files = ["LICENSE"]
+authors = [{ name = "Aditya Mishra" }]
 requires-python = ">=3.12"
+keywords = ["tts", "text-to-speech", "cache", "voice-agent", "pipecat"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
 dependencies = [
-    "tts-cache",
+    "smart-tts-cache>=0.2,<0.3",
     "pipecat-ai>=1.12,<1.13",
 ]
+
+[project.urls]
+Homepage = "https://github.com/adimyth/smart-tts-caching"
+Changelog = "https://github.com/adimyth/smart-tts-caching/blob/main/CHANGELOG.md"
+Issues = "https://github.com/adimyth/smart-tts-caching/issues"
 
 [project.scripts]
 tts-cache-pipecat = "tts_cache_pipecat.bench:main"
 
 [build-system]
-requires = ["hatchling>=1.25"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tts_cache_pipecat"]
+core-metadata-version = "2.4"
+
+[tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"

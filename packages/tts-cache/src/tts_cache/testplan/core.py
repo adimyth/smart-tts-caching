@@ -183,7 +183,7 @@ def environment() -> dict[str, Any]:
             "python": platform.python_version(),
             **{
                 p: _version(p)
-                for p in ("tts-cache", "tts-cache-pipecat", "pipecat-ai", "redis", "onnxruntime")
+                for p in ("smart-tts-cache", "smart-tts-cache-pipecat", "pipecat-ai", "redis", "onnxruntime")
             },
             "redis_server_6380": _redis_version(6380),
         },

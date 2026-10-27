@@ -18,3 +18,4 @@ harness/out/
 models/
 TEST_PLAN.md
 TEST_REPORT.md
+dist/

@@ -1230,7 +1230,7 @@ def environment(fake: bool) -> dict[str, Any]:
         "repo_dirty": bool(git("status", "--porcelain")),
         "pipecat_sha": git("rev-parse", "--short=9", "HEAD", cwd=Path.home() / "PersonalProjects" / "pipecat"),
         "pipecat_pinned": PIPECAT_SHA,
-        "versions": {p: version(p) for p in ("pipecat-ai", "tts-cache", "tts-cache-pipecat", "onnxruntime", "redis", "aiohttp")},
+        "versions": {p: version(p) for p in ("pipecat-ai", "smart-tts-cache", "smart-tts-cache-pipecat", "onnxruntime", "redis", "aiohttp")},
         "python": sys.version,
         "platform": subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.strip(),
         "settings": settings,

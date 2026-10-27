@@ -137,7 +137,7 @@ class RedisStore:
     ) -> None:
         if client is None:
             if aioredis is None:
-                raise ImportError("RedisStore needs the [redis] extra: pip install 'tts-cache[redis]'")
+                raise ImportError("RedisStore needs the [redis] extra: pip install 'smart-tts-cache[redis]'")
             client = aioredis.from_url(
                 url, socket_timeout=socket_timeout, socket_connect_timeout=socket_timeout
             )

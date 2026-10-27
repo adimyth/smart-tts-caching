@@ -1,8 +1,19 @@
 [project]
-name = "tts-cache"
-version = "0.1.0"
-description = "A framework-free, sentence-level cache for text-to-speech audio"
+name = "smart-tts-cache"
+version = "0.2.0"
+description = "A sentence-level cache for text-to-speech audio: an agent's repeated sentences play from the cache instead of the provider"
+readme = "README.md"
+license-files = ["LICENSE"]
+authors = [{ name = "Aditya Mishra" }]
 requires-python = ">=3.12"
+keywords = ["tts", "text-to-speech", "cache", "voice-agent", "pipecat"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
 dependencies = [
     "numpy>=1.26",
     "soundfile>=0.13",
@@ -24,12 +35,21 @@ similarity = [
 verify = []
 cli = []
 
+[project.urls]
+Homepage = "https://github.com/adimyth/smart-tts-caching"
+Changelog = "https://github.com/adimyth/smart-tts-caching/blob/main/CHANGELOG.md"
+Issues = "https://github.com/adimyth/smart-tts-caching/issues"
+
 [project.scripts]
 tts-cache = "tts_cache.cli:main"
 
 [build-system]
-requires = ["hatchling>=1.25"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tts_cache"]
+core-metadata-version = "2.4"
+
+[tool.hatch.build.targets.sdist]
+core-metadata-version = "2.4"

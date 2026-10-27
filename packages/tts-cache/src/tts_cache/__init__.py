@@ -15,7 +15,7 @@ from tts_cache.stores.sqlite import SQLiteStore
 from tts_cache.stores.tiered import TieredStore
 from tts_cache.verify import NoopVerifier, Verifier
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "DEFAULT_POLICY",

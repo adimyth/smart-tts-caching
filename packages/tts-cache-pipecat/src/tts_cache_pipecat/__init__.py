@@ -13,7 +13,7 @@ from tts_cache_pipecat.read import TTSCacheRead
 from tts_cache_pipecat.services import ElevenLabsDialogueTTSService, ElevenLabsTTSService, SarvamTTSService
 from tts_cache_pipecat.write import TTSCacheWrite
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "ElevenLabsDialogueTTSService",

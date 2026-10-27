@@ -4,9 +4,9 @@ requires-python = "==3.12.*"
 
 [manifest]
 members = [
+    "smart-tts-cache",
+    "smart-tts-cache-pipecat",
     "smart-tts-caching",
-    "tts-cache",
-    "tts-cache-pipecat",
 ]
 
 [[package]]
@@ -1516,6 +1516,63 @@ wheels = [
 ]
 
 [[package]]
+name = "smart-tts-cache"
+version = "0.2.0"
+source = { editable = "packages/tts-cache" }
+dependencies = [
+    { name = "numpy" },
+    { name = "sentencex" },
+    { name = "soundfile" },
+]
+
+[package.optional-dependencies]
+redis = [
+    { name = "redis" },
+]
+similarity = [
+    { name = "datasketch" },
+    { name = "hnswlib" },
+    { name = "huggingface-hub" },
+    { name = "model2vec" },
+    { name = "numpy" },
+    { name = "onnxruntime" },
+    { name = "rapidfuzz" },
+    { name = "tokenizers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasketch", marker = "extra == 'similarity'", specifier = ">=1.6" },
+    { name = "hnswlib", marker = "extra == 'similarity'", specifier = ">=0.8" },
+    { name = "huggingface-hub", marker = "extra == 'similarity'", specifier = ">=0.20" },
+    { name = "model2vec", marker = "extra == 'similarity'", specifier = ">=0.4" },
+    { name = "numpy", specifier = ">=1.26" },
+    { name = "numpy", marker = "extra == 'similarity'", specifier = ">=1.26" },
+    { name = "onnxruntime", marker = "extra == 'similarity'", specifier = ">=1.17" },
+    { name = "rapidfuzz", marker = "extra == 'similarity'", specifier = ">=3" },
+    { name = "redis", marker = "extra == 'redis'", specifier = ">=5" },
+    { name = "sentencex", specifier = ">=1.0.32" },
+    { name = "soundfile", specifier = ">=0.13" },
+    { name = "tokenizers", marker = "extra == 'similarity'", specifier = ">=0.15" },
+]
+provides-extras = ["redis", "similarity", "verify", "cli"]
+
+[[package]]
+name = "smart-tts-cache-pipecat"
+version = "0.2.0"
+source = { editable = "packages/tts-cache-pipecat" }
+dependencies = [
+    { name = "pipecat-ai" },
+    { name = "smart-tts-cache" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pipecat-ai", editable = "../pipecat" },
+    { name = "smart-tts-cache", editable = "packages/tts-cache" },
+]
+
+[[package]]
 name = "smart-tts-caching"
 version = "0.0.0"
 source = { virtual = "." }
@@ -1524,8 +1581,8 @@ dependencies = [
     { name = "fastapi" },
     { name = "pipecat-ai", extra = ["openai", "sarvam", "webrtc"] },
     { name = "python-dotenv" },
-    { name = "tts-cache", extra = ["redis", "similarity"] },
-    { name = "tts-cache-pipecat" },
+    { name = "smart-tts-cache", extra = ["redis", "similarity"] },
+    { name = "smart-tts-cache-pipecat" },
     { name = "uvicorn" },
 ]
 
@@ -1545,8 +1602,8 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
     { name = "pipecat-ai", extras = ["openai", "elevenlabs", "sarvam", "webrtc", "silero"], editable = "../pipecat" },
     { name = "python-dotenv", specifier = ">=1" },
-    { name = "tts-cache", extras = ["redis", "cli", "similarity"], editable = "packages/tts-cache" },
-    { name = "tts-cache-pipecat", editable = "packages/tts-cache-pipecat" },
+    { name = "smart-tts-cache", extras = ["redis", "cli", "similarity"], editable = "packages/tts-cache" },
+    { name = "smart-tts-cache-pipecat", editable = "packages/tts-cache-pipecat" },
     { name = "uvicorn", specifier = ">=0.32" },
 ]
 
@@ -1684,63 +1741,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ee/9f/c5201d42a484c061e528825fc8e2d565f5abd50a4ced6fb7d29c4ec99b2b/truststore-0.10.5.tar.gz", hash = "sha256:30d36967ccaded5cbb38d602c433f53600036c79d502f4533a49b60a03bbefcd", size = 28091, upload-time = "2026-10-12T22:27:31.808Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/51/e9/3a7820be2bb0fe53b6bc9c3be26d3d1158004e4c3ab953aa6840b955b1e9/truststore-0.10.5-py3-none-any.whl", hash = "sha256:9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c", size = 19017, upload-time = "2026-10-12T22:27:30.377Z" },
-]
-
-[[package]]
-name = "tts-cache"
-version = "0.1.0"
-source = { editable = "packages/tts-cache" }
-dependencies = [
-    { name = "numpy" },
-    { name = "sentencex" },
-    { name = "soundfile" },
-]
-
-[package.optional-dependencies]
-redis = [
-    { name = "redis" },
-]
-similarity = [
-    { name = "datasketch" },
-    { name = "hnswlib" },
-    { name = "huggingface-hub" },
-    { name = "model2vec" },
-    { name = "numpy" },
-    { name = "onnxruntime" },
-    { name = "rapidfuzz" },
-    { name = "tokenizers" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "datasketch", marker = "extra == 'similarity'", specifier = ">=1.6" },
-    { name = "hnswlib", marker = "extra == 'similarity'", specifier = ">=0.8" },
-    { name = "huggingface-hub", marker = "extra == 'similarity'", specifier = ">=0.20" },
-    { name = "model2vec", marker = "extra == 'similarity'", specifier = ">=0.4" },
-    { name = "numpy", specifier = ">=1.26" },
-    { name = "numpy", marker = "extra == 'similarity'", specifier = ">=1.26" },
-    { name = "onnxruntime", marker = "extra == 'similarity'", specifier = ">=1.17" },
-    { name = "rapidfuzz", marker = "extra == 'similarity'", specifier = ">=3" },
-    { name = "redis", marker = "extra == 'redis'", specifier = ">=5" },
-    { name = "sentencex", specifier = ">=1.0.32" },
-    { name = "soundfile", specifier = ">=0.13" },
-    { name = "tokenizers", marker = "extra == 'similarity'", specifier = ">=0.15" },
-]
-provides-extras = ["redis", "similarity", "verify", "cli"]
-
-[[package]]
-name = "tts-cache-pipecat"
-version = "0.1.0"
-source = { editable = "packages/tts-cache-pipecat" }
-dependencies = [
-    { name = "pipecat-ai" },
-    { name = "tts-cache" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "pipecat-ai", editable = "../pipecat" },
-    { name = "tts-cache", editable = "packages/tts-cache" },
 ]
 
 [[package]]

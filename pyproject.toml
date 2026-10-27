@@ -1,11 +1,11 @@
 [project]
 name = "smart-tts-caching"
 version = "0.0.0"
-description = "Development workspace for tts-cache and tts-cache-pipecat"
+description = "Development workspace for smart-tts-cache and smart-tts-cache-pipecat"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "tts-cache[redis,cli,similarity]",
-    "tts-cache-pipecat",
+    "smart-tts-cache[redis,cli,similarity]",
+    "smart-tts-cache-pipecat",
     # The harness drives these services against the live APIs.
     "pipecat-ai[openai,elevenlabs,sarvam,webrtc,silero]",
     "fastapi>=0.115",
@@ -31,8 +31,8 @@ package = false
 members = ["packages/tts-cache", "packages/tts-cache-pipecat"]
 
 [tool.uv.sources]
-tts-cache = { workspace = true }
-tts-cache-pipecat = { workspace = true }
+smart-tts-cache = { workspace = true }
+smart-tts-cache-pipecat = { workspace = true }
 # The pinned Pipecat: an editable checkout at commit 1d1385b6d (1.12.1.dev500).
 pipecat-ai = { path = "../pipecat", editable = true }
 
