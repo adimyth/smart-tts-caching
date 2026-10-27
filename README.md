@@ -145,15 +145,17 @@ The saving is the hit rate times the characters sent times the provider's price.
 
 ## Installation
 
-Requirements: Python 3.12, Pipecat at commit [`1d1385b6d`](https://github.com/pipecat-ai/pipecat/commit/1d1385b6d5e3375199f98b2d456e56472bee16d2), the version the adapter is verified against, and Redis 7 or Valkey for a cache shared across processes. The packages are not on PyPI yet, so install them from a clone, with Pipecat from that commit (add the extras your services need, such as `pipecat-ai[elevenlabs]`):
+Requirements: Python 3.12, Pipecat at commit [`1d1385b6d`](https://github.com/pipecat-ai/pipecat/commit/1d1385b6d5e3375199f98b2d456e56472bee16d2), the version the adapter is verified against, and Redis 7 or Valkey for a cache shared across processes. Install the two packages from PyPI with Pipecat from that commit, adding the extras your services need, such as `pipecat-ai[elevenlabs]`:
 
 ```bash
-git clone https://github.com/adimyth/smart-tts-caching.git && cd smart-tts-caching
 pip install "pipecat-ai @ git+https://github.com/pipecat-ai/pipecat.git@1d1385b6d5e3375199f98b2d456e56472bee16d2" \
-    "./packages/tts-cache[redis,similarity]" ./packages/tts-cache-pipecat
+    "smart-tts-cache[redis,similarity]" smart-tts-cache-pipecat
 ```
 
-`tts-cache` is the cache itself and does not import Pipecat; `tts-cache-pipecat` holds the two processors that go around the TTS service. The `redis` extra adds the shared store, and `similarity` adds Levels B and C: without it, only exact repeats are served. Pipecat 1.13 and later releases are not supported yet.
+`smart-tts-cache` is the cache itself and does not import Pipecat; `smart-tts-cache-pipecat` holds the two processors that go around the TTS service. They import as `tts_cache` and `tts_cache_pipecat`. The `redis` extra adds the shared store, and `similarity` adds Levels B and C: without it, only exact repeats are served. Pipecat 1.13 and later releases are not supported yet.
+
+> [!NOTE]
+> `tts-cache` on PyPI is an unrelated project that also installs a `tts_cache` module, so the two cannot share an environment.
 
 ## Quick start
 
@@ -225,7 +227,7 @@ print(cache.metrics.counts["hit"])  # sentences played from the cache so far
 
 ### Supported services
 
-The cache supports six Pipecat TTS services: the ones whose audio has been checked to arrive sentence by sentence, so each clip can be stored against the sentence it speaks. Websocket classes come from `tts-cache-pipecat` and close each sentence's server-side context; REST classes are Pipecat's own.
+The cache supports six Pipecat TTS services: the ones whose audio has been checked to arrive sentence by sentence, so each clip can be stored against the sentence it speaks. Websocket classes come from `smart-tts-cache-pipecat` and close each sentence's server-side context; REST classes are Pipecat's own.
 
 | Provider | Transport | Class to wire |
 |---|---|---|

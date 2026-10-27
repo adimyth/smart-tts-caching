@@ -4,14 +4,20 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-27
+
+The first release on PyPI.
+
 ### Added
 
 - A fallback-service hook for the Pipecat adapter: `register_fallback_service` and `mark_primary_audio`, so that audio from a fallback provider is never stored under the primary voice's key.
+- A live demo in one command: `demo/quickstart.sh` installs the workspace, starts Redis, asks for the keys, and starts a Pipecat agent with the cache over WebRTC.
 - `LICENSE`, `CHANGELOG.md` and `CONTRIBUTING.md`.
 - The evaluation plan and report under `docs/evaluation/`, with the frozen environment and live summary of the 2026-10-20 run.
 
 ### Changed
 
+- The distributions are renamed `smart-tts-cache` and `smart-tts-cache-pipecat`, because `tts-cache` on PyPI belongs to an unrelated project. The import names stay `tts_cache` and `tts_cache_pipecat`, and the commands stay `tts-cache` and `tts-cache-pipecat`.
 - The README is rewritten around results, the quick start and operations.
 
 ## [0.1.0] - 2026-10-21
