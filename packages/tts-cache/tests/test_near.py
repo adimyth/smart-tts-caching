@@ -18,6 +18,9 @@ from tts_cache.stores.memory import MemoryStore
 from tts_cache.stores.tiered import TieredStore
 
 FIXTURES = Path(__file__).parent / "fixtures"
+# These tests check what Level B matches, not how fast. Under the production deadline a loaded
+# CI runner can push a lookup past it; that lookup fails open and drops its "near" event.
+LOOKUP_DEADLINE_MS = 1000.0
 LANGS = tuple(sorted(p.stem for p in (FIXTURES / "near").glob("*.yaml")))
 CASES = [
     (lang, c) for lang in LANGS for c in yaml.safe_load((FIXTURES / "near" / f"{lang}.yaml").read_text())
@@ -133,6 +136,7 @@ async def test_slot_variations_are_never_served(classes: set[str]) -> None:
             policy=AllOf(Probation(), MinChars(), LevelB(classes)),
             matcher=Matchers(near=near),
             metrics=sink,
+            deadline_ms=LOOKUP_DEADLINE_MS,
         )
         for stored, _ in items:
             await cache.capture(stored, tone_pcm(stored), SR)
@@ -192,6 +196,7 @@ async def test_level_b_serves_only_allowed_classes_and_reports_the_histogram() -
         policy=AllOf(Probation(), MinChars(), LevelB({"punctuation"})),
         matcher=Matchers(near=near),
         metrics=sink,
+        deadline_ms=LOOKUP_DEADLINE_MS,
     )
     stored = [
         "Sure, let me check that for you.",
@@ -233,6 +238,7 @@ async def test_a_question_is_never_served_as_a_statement(stored: str, query: str
         policy=AllOf(Probation(), MinChars(), LevelB({"punctuation", "filler"})),
         matcher=Matchers(near=near),
         metrics=sink,
+        deadline_ms=LOOKUP_DEADLINE_MS,
     )
     await cache.capture(stored, tone_pcm(stored), SR)
     await cache.drain(10)
