@@ -51,6 +51,7 @@ To watch instead, the launch video is in [English](smart-tts-caching-en.mp4) and
     - [Known limitations](#known-limitations)
   - [License](#license)
   - [Design](#design)
+  - [Contributing](#contributing)
 
 ## Why
 
@@ -118,15 +119,19 @@ The corpora are synthetic, so [estimate your own hit rate](#1-estimate-the-hit-r
 
 ### Latency
 
-Latency here is the wait from the moment a sentence is ready to speak until its first audio frame. p50 is the median and p95 is the slow end. The provider row covers live calls to the six service classes, one provider on one transport: OpenAI over REST, ElevenLabs over REST, ElevenLabs over a multi-context websocket, ElevenLabs Text-to-Dialogue over a websocket, Sarvam over REST, and Sarvam over a websocket. The class to wire for each is under [Supported services](#supported-services). The other rows are the live ElevenLabs (`eleven_flash_v2_5`, English) and Sarvam (`bulbul:v4-flash`, Hindi) websocket runs.
+The number that matters is how long the caller waits for the agent to start talking: from the moment the agent's first sentence of a turn is ready until its first sound plays. Measured live, on the same calls, with and without a cache hit:
 
-| What we measured | Result | What it means |
+| Median wait for a turn's first sound | ElevenLabs `eleven_flash_v2_5`, English | Sarvam `bulbul:v4-flash`, Hindi |
 |---|---|---|
-| Time until the provider returns the first audio of a sentence, across the six service classes | 131 ms to 2.4 s | This is the wait on a miss. ElevenLabs Text-to-Dialogue over websocket was 131 ms. Sarvam over REST, in Hindi, was 2.4 s |
-| Time until the first audio of a turn, when that opening sentence is a cache hit | 7.7 ms p50 on ElevenLabs, 8.7 ms p50 on Sarvam | The caller hears the start of the turn from the cache. The opening sentence is the one that matters: a later sentence waits until the previous sentence has finished playing, so its clock includes playback |
-| Time the cache spends on a miss, before the provider is called | 0.8 to 1.4 ms p50, 2.4 ms p95 | A miss still goes to the provider. The lookup in front of that call is about a millisecond |
-| How much sooner a turn starts when a third of turns open on a hit | 60 ms sooner on average on ElevenLabs, 54 ms on Sarvam | One turn in three starts from the cache and the rest wait on the provider. Those cached openings pull the average start time forward by about 60 ms |
-| Redis paused for 5 s, then restarted | No error reached the pipeline. The cache's added time peaked at 23 ms | A store that is down becomes an ordinary provider request, inside the 20 ms deadline |
+| The provider synthesises the sentence (a miss) | 177 ms | 170 ms |
+| The cache plays the stored clip (a hit) | 7.7 ms | 8.7 ms |
+
+- **A miss costs about a millisecond more.** The lookup before the provider call takes 0.8 ms (ElevenLabs) and 1.4 ms (Sarvam) at the median, 2.4 ms at the 95th percentile.
+- **Over a whole call**, with one turn in three opening on a cached sentence, the average turn started 60 ms sooner on ElevenLabs (187 → 127 ms) and 54 ms sooner on Sarvam (173 → 119 ms).
+- **Slower providers gain more.** Across the six [supported services](#supported-services), the provider's first sound took from 131 ms (ElevenLabs Text-to-Dialogue) to 2.4 s (Sarvam over REST), while a hit started in 1.4 to 8.3 ms on each of them.
+- **A Redis outage is harmless.** With Redis paused for 5 s and restarted, no error reached the pipeline; each lookup gave up within 23 ms and the sentence went to the provider.
+
+Only a turn's first sentence is timed: later sentences wait for the one before them to finish playing, so their wait says nothing about the cache.
 
 ### Cost
 
@@ -138,25 +143,17 @@ The saving is the hit rate times the characters sent times the provider's price.
 | Sarvam `bulbul:v4-flash` | ~$24 | ~$5 | ~$9 |
 | OpenAI `gpt-4o-mini-tts` | ~$16 | ~$3 | ~$6 |
 
-Against a managed Redis at ElastiCache Serverless list prices, and at 100,000 calls a month or more, the cache pays for itself above a character hit rate of about 7 % on ElevenLabs with Valkey and about 20 % on Sarvam with Redis OSS. A process with the cache uses about 100 MB more memory.
-
 ## Installation
 
-Requirements: Python 3.12; `pipecat-ai` 1.12.x, verified against commit `1d1385b6d` of [pipecat-ai/pipecat](https://github.com/pipecat-ai/pipecat), which is the checkout CI installs; and, for a store shared across processes, Redis (tested with 7.0) or another Redis-protocol server such as Valkey. The packages are not published to PyPI yet. Install them from a checkout of this repository:
+Requirements: Python 3.12, Pipecat at commit [`1d1385b6d`](https://github.com/pipecat-ai/pipecat/commit/1d1385b6d5e3375199f98b2d456e56472bee16d2), the version the adapter is verified against, and Redis 7 or Valkey for a cache shared across processes. The packages are not on PyPI yet, so install them from a clone, with Pipecat from that commit (add the extras your services need, such as `pipecat-ai[elevenlabs]`):
 
 ```bash
-pip install "./packages/tts-cache[redis,similarity]" ./packages/tts-cache-pipecat
+git clone https://github.com/adimyth/smart-tts-caching.git && cd smart-tts-caching
+pip install "pipecat-ai @ git+https://github.com/pipecat-ai/pipecat.git@1d1385b6d5e3375199f98b2d456e56472bee16d2" \
+    "./packages/tts-cache[redis,similarity]" ./packages/tts-cache-pipecat
 ```
 
-| Package or extra | Provides |
-|---|---|
-| `tts-cache` | The framework-free core: splitting, canonicalisation, keys, matching, stores, policies, metrics and the `tts-cache` command |
-| `tts-cache[redis]` | `RedisStore` |
-| `tts-cache[similarity]` | Levels B and C; without it the cache runs Level A only |
-| `tts-cache-pipecat` | The Pipecat adapter, for `pipecat-ai>=1.12,<1.13` |
-
-> [!NOTE]
-> `tts-cache` is the cache. It does not import Pipecat, so estimates and tests can run without a pipeline. `tts-cache-pipecat` is the adapter for a Pipecat pipeline on `pipecat-ai` 1.12.x. It provides `TTSCacheRead` and `TTSCacheWrite`, the two processors placed around the TTS service, and the websocket subclasses for ElevenLabs and Sarvam. A subclass closes each sentence's server-side context, which is how the cache knows which audio belongs to which sentence. REST services use Pipecat's own classes.
+`tts-cache` is the cache itself and does not import Pipecat; `tts-cache-pipecat` holds the two processors that go around the TTS service. The `redis` extra adds the shared store, and `similarity` adds Levels B and C: without it, only exact repeats are served. Pipecat 1.13 and later releases are not supported yet.
 
 ## Quick start
 
@@ -216,13 +213,19 @@ Always build the scope with `scope_from_service`, so the key names the voice the
 
 ### 3. Check it
 
-Say the same sentence in two turns. The second must make no provider request (Pipecat's `on_tts_request` event does not fire) and must still play. [`harness/integration_check.py`](harness/integration_check.py) runs this check against a live ElevenLabs or Sarvam service and Redis.
+Say the same sentence in two turns. The second time it must still play, without a request to the provider:
+
+```python
+@tts.event_handler("on_tts_request")
+async def on_tts_request(_tts, _context_id, text):
+    print("sent to the provider:", text)  # a sentence played from the cache never shows up here
+
+print(cache.metrics.counts["hit"])  # sentences played from the cache so far
+```
 
 ### Supported services
 
-A service class is one provider on one transport. These six are the classes the latency numbers cover.
-
-Websocket classes come from `tts-cache-pipecat` and close each sentence's server-side context, so its audio can be stored against that sentence. REST classes are Pipecat's own.
+The cache supports six Pipecat TTS services: the ones whose audio has been checked to arrive sentence by sentence, so each clip can be stored against the sentence it speaks. Websocket classes come from `tts-cache-pipecat` and close each sentence's server-side context; REST classes are Pipecat's own.
 
 | Provider | Transport | Class to wire |
 |---|---|---|
@@ -232,6 +235,8 @@ Websocket classes come from `tts-cache-pipecat` and close each sentence's server
 | ElevenLabs | Text-to-Dialogue websocket | `tts_cache_pipecat.ElevenLabsDialogueTTSService` |
 | Sarvam | REST | `pipecat.services.sarvam.tts.SarvamHttpTTSService` |
 | Sarvam | Websocket | `tts_cache_pipecat.SarvamTTSService` |
+
+Other Pipecat TTS services, such as Cartesia or Deepgram, are not supported yet. `scope_from_service` raises `UnsupportedService` for a class it does not know, so an unsupported service fails at start-up instead of caching audio it cannot attribute. Adding one takes a `register_service` call, a subclass for a websocket service, and a passing run of `harness/attribution.py`; see "A provider" in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Configuration
 
@@ -281,7 +286,11 @@ The judge loads a 1.1 GB model at construction, downloaded from the Hugging Face
 
 **Sizing.** Clips are stored as Opus at 32 kbps, about 17 to 19 KB per sentence in Redis with metadata, so 10,000 clips take about 180 MB. Warm start loads up to `warm_start_bytes` (4 MB in the example) in about 20 ms.
 
-**Retention.** A new clip lives 48 hours. Its first hit extends it to 30 days, and every later hit renews that window, so sentences said once expire on their own. To cap Redis's size, set `maxmemory` with an LFU eviction policy.
+**Expiry and eviction.** Clips expire on a clock, and Redis evicts them when it is full.
+
+- *Expiry, by time.* A new clip lives 48 hours. Its first hit extends that to 30 days, and every later hit restarts the 30 days, so a sentence said once is gone after two days and a sentence that keeps playing never expires. Redis deletes expired clips itself; there is no sweep job. `Probation("48h", "30d")` in a policy sets the two windows.
+- *Eviction, by size.* The cache does not cap Redis's size. Set `maxmemory` and `maxmemory-policy allkeys-lfu` on the server: when Redis is full it drops the least frequently used clips, and those sentences become misses.
+- *Process memory.* Each process keeps the hot set it loaded at start (`warm_start_bytes`) for its whole life, plus up to 64 MB of decoded clips played since (`session_bytes`). When that is full it drops the clips that save the fewest characters for their size.
 
 **What Redis holds.** For each clip, the audio under a hashed key, and a metadata hash with the sentence's text and canonical text, its tags, format, timestamps and counters. The text is needed to build the Level B index and to purge by text. Use `SkipIfMatches` to keep identifiers out; no regular expression catches names.
 
@@ -322,3 +331,7 @@ Using this software requires credit to this repository. A sufficient credit is t
 ## Design
 
 The design, with the reasoning behind each decision, is in [SOLUTION.md](SOLUTION.md).
+
+## Contributing
+
+The development setup, the checks a change must pass and how to add a language or a provider are in [CONTRIBUTING.md](CONTRIBUTING.md).
