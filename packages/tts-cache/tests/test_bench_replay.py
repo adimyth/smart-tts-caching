@@ -43,6 +43,7 @@ def test_corpus_in_indic_languages(language: str) -> None:
     assert [x for t in c.turns for x in split_text(" ".join(t), language)] == c.sentences
 
 
+@pytest.mark.slow  # a wall-clock budget: a local check, deselected in CI
 async def test_bench_adds_under_1_ms_per_sentence_at_r0(tmp_path) -> None:
     """Gate: single-process profile."""
     corpus = generate(200, 0.0, seed=1)
