@@ -90,8 +90,8 @@ A **slot** is a fact inside the sentence: a name, a number, a date, an amount, o
 | **B**, near duplicate | The same words, differing only in punctuation or leading and trailing filler | On by default | MinHash candidates, an edit-distance check and a diff classifier. A changed slot, a negation, or a question mark is never served |
 | **C**, paraphrase | The same meaning in different words | Experimental, off | A multilingual encoder (`multilingual-e5-small`) proposes the nearest stored sentence. The slot veto compares the facts and refuses the candidate when they differ. The span veto refuses a candidate whose only difference is one short stretch, such as a name swapped for another name, or a "not" added or dropped. An entailment model (`mDeBERTa-v3-base`) must then find that each sentence entails the other |
 
-> [!WARNING]
-> Level C is not safe for production. On an adversarial corpus it played statements for questions (289 of 421 English pairs) and served real changes of meaning: asked for "My colleague Tanvi will not follow up with you by Thursday", it played "You will hear back from my colleague Tanvi no later than Thursday".
+> [!NOTE]
+> Level C matches on meaning, so how well it does depends on how your agent phrases things. Try it on your own calls before using it in production, and check that every sentence it plays says what the agent meant.
 
 ## Results
 
@@ -281,7 +281,7 @@ from tts_cache.cache import default_matcher
 cache = TTSCache(scope, store, policy=LEVEL_C_POLICY, matcher=default_matcher(judge=True))
 ```
 
-The judge loads a 1.1 GB model at construction, downloaded from the Hugging Face Hub on first use. It adds about 3.2 GB of memory per process and 20 to 40 ms to every sentence that Levels A and B miss. When it serves, the stored sentence replaces the LLM's text in the transcript. See the warning under [Match levels](#match-levels) before enabling it.
+The judge loads a 1.1 GB model at construction, downloaded from the Hugging Face Hub on first use. It adds about 3.2 GB of memory per process and 20 to 40 ms to every sentence that Levels A and B miss. When it serves, the stored sentence replaces the LLM's text in the transcript. Try it on your own calls first, as the note under [Match levels](#match-levels) describes.
 
 ## Operations
 
@@ -323,7 +323,7 @@ A purge clears Redis and the calling process at once. Other running processes ke
 
 ### Known limitations
 
-- **Level C is unsafe.** It serves statements for questions and some changes of meaning; see [Match levels](#match-levels).
+- **Level C needs testing on your data.** Its matches depend on how your agent phrases things; see [Match levels](#match-levels).
 - **A purge reaches other processes only when they restart.** See [Deleting audio](#operations).
 - **Pipecat coupling.** The adapter relies on internal `TTSService` behaviour verified at `pipecat-ai` 1.12.x, commit `1d1385b6d`, and pins that minor version. After an upgrade, rerun `harness/attribution.py`. Undetected drift trips the key check and degrades to no cache, not to wrong audio.
 
