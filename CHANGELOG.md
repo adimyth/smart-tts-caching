@@ -6,7 +6,7 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [0.2.0] - 2026-10-27
 
-The first release on PyPI.
+The first tagged release, under the new distribution names.
 
 ### Added
 
@@ -20,7 +20,7 @@ The first release on PyPI.
 - The distributions are renamed `smart-tts-cache` and `smart-tts-cache-pipecat`, because `tts-cache` on PyPI belongs to an unrelated project. The import names stay `tts_cache` and `tts_cache_pipecat`, and the commands stay `tts-cache` and `tts-cache-pipecat`.
 - The README is rewritten around results, the quick start and operations.
 
-## [0.1.0] - 2026-10-21
+## 0.1.0 - 2026-10-21
 
 The first release: a sentence-level TTS audio cache in two packages, `tts-cache` (the framework-free core) and `tts-cache-pipecat` (the adapter for `pipecat-ai` 1.12.x).
 
@@ -42,5 +42,5 @@ The first release: a sentence-level TTS audio cache in two packages, `tts-cache`
 - Level C became opt-in after the offline evaluation, and gained the NLI judge.
 - Level B never serves a statement's audio for a question, or the reverse.
 
-[Unreleased]: https://github.com/adimyth/smart-tts-caching/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/adimyth/smart-tts-caching/releases/tag/v0.1.0
+[Unreleased]: https://github.com/adimyth/smart-tts-caching/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/adimyth/smart-tts-caching/releases/tag/v0.2.0

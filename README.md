@@ -145,11 +145,12 @@ The saving is the hit rate times the characters sent times the provider's price.
 
 ## Installation
 
-Requirements: Python 3.12, Pipecat at commit [`1d1385b6d`](https://github.com/pipecat-ai/pipecat/commit/1d1385b6d5e3375199f98b2d456e56472bee16d2), the version the adapter is verified against, and Redis 7 or Valkey for a cache shared across processes. Install the two packages from PyPI with Pipecat from that commit, adding the extras your services need, such as `pipecat-ai[elevenlabs]`:
+Requirements: Python 3.12, Pipecat at commit [`1d1385b6d`](https://github.com/pipecat-ai/pipecat/commit/1d1385b6d5e3375199f98b2d456e56472bee16d2), the version the adapter is verified against, and Redis 7 or Valkey for a cache shared across processes. That Pipecat commit needs `onnxruntime` 1.24, which has no build for Intel Macs. Install the two packages from this repository's `v0.2.0` tag with Pipecat from that commit, adding the extras your services need, such as `pipecat-ai[elevenlabs]`:
 
 ```bash
 pip install "pipecat-ai @ git+https://github.com/pipecat-ai/pipecat.git@1d1385b6d5e3375199f98b2d456e56472bee16d2" \
-    "smart-tts-cache[redis,similarity]" smart-tts-cache-pipecat
+    "smart-tts-cache[redis,similarity] @ git+https://github.com/adimyth/smart-tts-caching.git@v0.2.0#subdirectory=packages/tts-cache" \
+    "smart-tts-cache-pipecat @ git+https://github.com/adimyth/smart-tts-caching.git@v0.2.0#subdirectory=packages/tts-cache-pipecat"
 ```
 
 `smart-tts-cache` is the cache itself and does not import Pipecat; `smart-tts-cache-pipecat` holds the two processors that go around the TTS service. They import as `tts_cache` and `tts_cache_pipecat`. The `redis` extra adds the shared store, and `similarity` adds Levels B and C: without it, only exact repeats are served. Pipecat 1.13 and later releases are not supported yet.
