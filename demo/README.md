@@ -11,10 +11,13 @@ On macOS or Linux, from a fresh clone:
 ./demo/quickstart.sh --lang en            # the same agent in English
 ./demo/quickstart.sh --prompt my.txt      # your own system prompt
 ./demo/quickstart.sh --mode scripted      # the launch video's two calls; needs only a Sarvam key
+./demo/quickstart.sh --mode pure          # the LLM words every line itself, so fewer repeat
 ./demo/quickstart.sh --no-level-c         # Levels A and B only; skips the Level C models
 ```
 
 The script installs [uv](https://docs.astral.sh/uv/) if it is missing, clones the pinned Pipecat commit beside this repository (where `pyproject.toml` and CI expect it), runs `uv sync`, starts Redis on port 6380 with `redis-server` or else Docker, and asks for the keys it needs: `SARVAM_API_KEY` ([dashboard.sarvam.ai](https://dashboard.sarvam.ai)) always, and `OPENAI_API_KEY` for the LLM unless the mode is scripted. It saves them to `.env`. It then starts the agent, waits until it serves, and opens http://127.0.0.1:7860.
+
+The demo persona runs in hybrid mode: the LLM answers the caller, and says the hospital's standard lines (the greeting, the confirmations, the closing) word for word, as a production agent's script does. In pure mode it rewords them on every call, so few sentences repeat; your own prompt runs in pure mode.
 
 Press Connect and talk. Hang up, press Connect again and say the same things: the second call opens on a warm cache, and every sentence the agent repeats shows a HIT badge with its time to first audio. "Pause Redis 5 s" pauses the store mid-call to show the cache failing open. In scripted mode, pick call 1, then call 2.
 

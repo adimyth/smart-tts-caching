@@ -4,9 +4,13 @@
     .venv/bin/python demo/try.py --prompt my_prompt.txt  # your own agent
     .venv/bin/python demo/try.py --lang en --no-level-c  # English voice, Levels A and B only
     .venv/bin/python demo/try.py --mode scripted         # the launch video's calls, no microphone
+    .venv/bin/python demo/try.py --mode pure             # the LLM with the persona alone
 
-It checks the keys and Redis, starts the agent in pure LLM mode with your prompt, waits until it
-is up, and opens the call page in your browser with the microphone on. Talk to the bot, hang up, press Connect again and say
+It checks the keys and Redis, starts the agent, waits until it is up, and opens the call page in
+your browser with the microphone on. The demo persona runs in hybrid mode: the LLM answers the
+caller, and says the hospital's standard lines (the greeting, the confirmations, the closing) word
+for word, as a production agent's script does. In pure mode the LLM rewords them on every call,
+so few sentences repeat. Your own prompt runs in pure mode. Talk to the bot, hang up, press Connect again and say
 the same things: the second call opens on a warm cache, and every sentence the bot repeats
 shows a HIT badge with its time to first audio. "Pause Redis 5 s" shows the cache failing open.
 
@@ -39,7 +43,11 @@ def main() -> int:
         "--lang", choices=("hi", "en"), default="hi", help="the bot's voice and the cache's language"
     )
     ap.add_argument("--llm", default="gpt-5.6-luna")
-    ap.add_argument("--mode", choices=("pure", "hybrid", "scripted"), default="pure")
+    ap.add_argument(
+        "--mode",
+        choices=("pure", "hybrid", "scripted"),
+        help="hybrid for the demo persona, pure with --prompt (the default for each)",
+    )
     ap.add_argument("--redis", default="redis://localhost:6380/9")
     ap.add_argument("--port", type=int, default=7860)
     ap.add_argument(
@@ -50,6 +58,8 @@ def main() -> int:
     ap.add_argument("--keep-cache", action="store_true", help="do not empty the cache at start")
     ap.add_argument("--no-open", action="store_true", help="print the link without opening a browser")
     a = ap.parse_args()
+    # Hybrid pins the persona's lines; your own prompt replaces the persona, so it runs pure.
+    a.mode = a.mode or ("pure" if a.prompt else "hybrid")
 
     load_dotenv(ROOT / ".env")
     need = ["SARVAM_API_KEY"] + ([] if a.mode == "scripted" else ["OPENAI_API_KEY"])

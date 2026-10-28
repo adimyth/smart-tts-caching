@@ -5,6 +5,7 @@
 #     ./demo/quickstart.sh --lang en            # the same agent in English
 #     ./demo/quickstart.sh --prompt my.txt      # your own system prompt
 #     ./demo/quickstart.sh --mode scripted      # the launch video's calls; needs only a Sarvam key
+#     ./demo/quickstart.sh --mode pure          # the LLM words every line itself, so fewer repeat
 #     ./demo/quickstart.sh --no-level-c         # Levels A and B only; skips the 1.6 GB of Level C models
 #
 # It installs uv if it is missing, clones the pinned Pipecat beside this repository (where the
@@ -74,7 +75,7 @@ if ! redis_ok; then
 fi
 
 # 5. API keys: Sarvam for speech-to-text and the voice, OpenAI for the LLM (not in scripted mode).
-mode=pure
+mode=hybrid
 prev=
 for arg in "$@"; do
   [ "$prev" = --mode ] && mode=$arg
